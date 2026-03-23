@@ -150,15 +150,19 @@ class App(ctk.CTk):
         """Called on the GUI thread after backend.start() succeeds."""
         self._log_panel.info("Backend ready — database, settings, and cookies loaded.")
         self._status_bar.set_message("Ready")
-        self._status_bar.update_cookie_status(
-            douyin=bool(self.backend.parameter and self.backend.parameter.cookie),
-            tiktok=bool(self.backend.parameter and self.backend.parameter.cookie_tiktok),
+        self._status_bar.set_cookie_status(
+            "Douyin",
+            bool(self.backend.parameter and self.backend.parameter.cookie),
+        )
+        self._status_bar.set_cookie_status(
+            "TikTok",
+            bool(self.backend.parameter and self.backend.parameter.cookie_tiktok),
         )
         # Update FFmpeg indicator
         ffmpeg_ok = bool(
             self.backend.parameter and self.backend.parameter.ffmpeg
         )
-        self._status_bar.update_ffmpeg_status(ffmpeg_ok)
+        self._status_bar.set_ffmpeg(ffmpeg_ok)
 
     def _on_backend_error(self, exc: BaseException) -> None:
         """Called on the GUI thread if backend.start() raises."""
