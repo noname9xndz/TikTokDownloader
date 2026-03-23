@@ -22,12 +22,13 @@ from typing import Any, Callable, Dict, Optional
 import customtkinter as ctk
 
 from ..theme import Theme
+from src.custom import PROJECT_ROOT
 
 __all__ = ["SettingsFrame"]
 
 # ── helpers ──────────────────────────────────────────────────────────────────
 
-_SETTINGS_PATH = Path(__file__).resolve().parents[2] / "settings.json"
+_SETTINGS_PATH = PROJECT_ROOT / "settings.json"
 _ENCODE = "UTF-8-SIG"
 
 _STORAGE_FORMATS = ["", "csv", "xlsx"]
@@ -861,10 +862,25 @@ class SettingsFrame(ctk.CTkFrame):
         return data
 
     def _save_settings(self) -> None:
-        """Collect values and write to settings.json."""
+        """Collect values and write to settings.json, then reload backend."""
         data = self._collect_settings()
         _save_settings(data)
-        self._log("✅ Settings saved successfully!")
+        self._log("✅ Settings saved to disk.")
+
+        # Reload the backend Parameter so changes take effect immediately
+        if self._app and hasattr(self._app, "backend") and self._app.backend:
+            try:
+                import asyncio
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    loop.create_task(self._app.backend.reload_parameter())
+                else:
+                    loop.run_until_complete(self._app.backend.reload_parameter())
+                self._log("✅ Backend reloaded — settings are now active!")
+            except Exception as exc:
+                self._log(f"⚠ Settings saved but backend reload failed: {exc}")
+        else:
+            self._log("⚠ Settings saved to disk (restart to apply).")
 
     def _reset_defaults(self) -> None:
         """Reset all fields to the defaults from config/settings.py."""
