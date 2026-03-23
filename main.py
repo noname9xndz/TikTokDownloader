@@ -1,5 +1,6 @@
 from asyncio import CancelledError
 from asyncio import run
+import sys
 
 from src.application import TikTokDownloader
 
@@ -16,4 +17,9 @@ async def main():
 
 
 if __name__ == "__main__":
-    run(main())
+    if "--gui" in sys.argv:
+        from src.gui_edition.gui_main import launch_gui
+        launch_gui()
+    else:
+        run(main())
+

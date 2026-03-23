@@ -16,12 +16,26 @@ from typing import TYPE_CHECKING, Dict, Optional
 
 import customtkinter as ctk
 
+from ..coroutine_factory import (
+    CoroFactory,
+    make_account_factory,
+    make_collection_factory,
+    make_collection_music_factory,
+    make_collects_factory,
+    make_comment_factory,
+    make_hot_factory,
+    make_link_factory,
+    make_live_factory,
+    make_mix_factory,
+    make_search_factory,
+    make_user_factory,
+)
 from ..download_manager import DownloadManager, TaskInfo, TaskStatus
 from ..theme import Theme
 from ..widgets import ProgressCard
 
 if TYPE_CHECKING:
-    pass
+    from ..backend_bootstrap import BackendBootstrap
 
 __all__ = ["DownloadFrame"]
 
@@ -787,6 +801,56 @@ class DownloadFrame(ctk.CTkFrame):
             else:
                 overlay.place_forget()
 
+    # ── coroutine factory helper ──────────────────────────────────────
+
+    def _get_factory(
+        self,
+        mode: str,
+        **extra,
+    ) -> Optional[CoroFactory]:
+        """Map a *mode* string to the correct coroutine factory.
+
+        Returns ``None`` if the backend hasn't initialised yet.
+        """
+        backend: Optional["BackendBootstrap"] = getattr(self._app, "backend", None)
+        if backend is None or not backend.is_ready:
+            return None
+        param, db = backend.parameter, backend.database
+        is_tiktok = self._platform == "TikTok"
+
+        match mode:
+            case "link":
+                return make_link_factory(param, db, tiktok=is_tiktok)
+            case "account":
+                return make_account_factory(param, db, tiktok=is_tiktok)
+            case "mix":
+                return make_mix_factory(param, db, tiktok=is_tiktok)
+            case "live":
+                return make_live_factory(param, db, tiktok=is_tiktok)
+            case "comment":
+                return make_comment_factory(param, db, tiktok=is_tiktok)
+            case "user":
+                return make_user_factory(param, db, tiktok=is_tiktok)
+            case "collection":
+                return make_collection_factory(param, db)
+            case "collects":
+                return make_collects_factory(param, db)
+            case "collection_music":
+                return make_collection_music_factory(param, db)
+            case "hot":
+                return make_hot_factory(param, db)
+            case "search":
+                return make_search_factory(
+                    param,
+                    db,
+                    keyword=extra.get("keyword", ""),
+                    channel=extra.get("channel", 0),
+                    pages=extra.get("pages", 1),
+                )
+            case _:
+                self._log(f"⚠ Unknown mode '{mode}' — no factory available")
+                return None
+
     # ── start download / action ──────────────────────────────────────
 
     def _on_start(self, mode: str, urls: list):
@@ -803,12 +867,17 @@ class DownloadFrame(ctk.CTkFrame):
             self._log(f"⚠ Backend not initialised — cannot start {label}")
             return
 
+        factory = self._get_factory(mode)
+        if factory is None:
+            self._log(f"⚠ Backend not ready — cannot start {label}")
+            return
+
         info = self._manager.submit(
             mode=mode,
             platform=platform,
             urls=urls,
             label=label,
-            backend_coro_factory=None,  # placeholder — Phase 7
+            backend_coro_factory=factory,
         )
         self._log(f"📥 Queued: {label} [{info.task_id}]")
 
@@ -818,6 +887,7 @@ class DownloadFrame(ctk.CTkFrame):
         keyword = params.get("keyword", "")
         channel_names = _SearchTab._CHANNELS
         channel = params.get("channel", 0)
+        pages = params.get("pages", 1)
         ch_name = channel_names[channel] if channel < len(channel_names) else "General"
         label = f"{self._platform} Search: \"{keyword}\" ({ch_name})"
 
@@ -825,12 +895,19 @@ class DownloadFrame(ctk.CTkFrame):
             self._log(f"⚠ Backend not initialised — cannot start {label}")
             return
 
+        factory = self._get_factory(
+            "search", keyword=keyword, channel=channel, pages=pages,
+        )
+        if factory is None:
+            self._log(f"⚠ Backend not ready — cannot start search")
+            return
+
         info = self._manager.submit(
             mode="search",
             platform=platform,
             urls=[],
             label=label,
-            backend_coro_factory=None,  # placeholder — Phase 7
+            backend_coro_factory=factory,
         )
         self._log(f"🔍 Queued: {label} [{info.task_id}]")
 

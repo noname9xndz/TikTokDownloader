@@ -15,7 +15,7 @@ from .backend_bootstrap import BackendBootstrap
 from .console_adapter import GUIConsole
 from .frames import DownloadFrame, MonitorFrame, SettingsFrame
 from .theme import Theme
-from .widgets import LogPanel, Sidebar, StatusBar
+from .widgets import LogPanel, Sidebar, StatusBar, show_error
 
 __all__ = ["App"]
 
@@ -164,16 +164,25 @@ class App(ctk.CTk):
         """Called on the GUI thread if backend.start() raises."""
         self._log_panel.error(f"Backend init failed: {exc}")
         self._status_bar.set_message("Backend init failed — check logs")
+        show_error(
+            self,
+            title="Backend Initialisation Failed",
+            message="The backend could not start. Some features may be unavailable.",
+            exc=exc,
+        )
 
     # ── Lifecycle ─────────────────────────────────────────────────────
 
     def _on_close(self) -> None:
         """Cleanup before exit."""
-        self._log_panel.info("Shutting down…")
-        # Tear down backend (fire-and-forget on the async loop)
-        if self.backend.is_ready:
-            self.async_handler.run_async(self.backend.shutdown())
-        self.async_handler.shutdown()
+        try:
+            self._log_panel.info("Shutting down…")
+            # Tear down backend (fire-and-forget on the async loop)
+            if self.backend.is_ready:
+                self.async_handler.run_async(self.backend.shutdown())
+            self.async_handler.shutdown()
+        except Exception:
+            pass  # best-effort cleanup — never block exit
         self.destroy()
 
     def run(self) -> None:

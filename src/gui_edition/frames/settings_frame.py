@@ -1,10 +1,12 @@
 """SettingsFrame — full configuration panel for DouK-Downloader.
 
 Sections:
-  1. Cookie Management  (Douyin + TikTok paste / browser import)
-  2. Directory & Format  (output folder, storage format, name template)
+  1. Cookie Management    (Douyin + TikTok paste / browser import)
+  2. Directory & Format   (output folder, storage format, name template)
   3. Download Options     (platform toggles, type filter, folder mode, music)
   4. Advanced             (proxy, chunk, timeout, retry, record, logger, language)
+  5. Text Replacement     (old → new pairs applied to file names)
+  6. Download Records     (delete download records by ID or "ALL")
 
 Settings are read from / written to ``settings.json`` via
 ``src.config.settings.Settings``.
@@ -134,6 +136,12 @@ class SettingsFrame(ctk.CTkFrame):
 
         # ── Section 4: Advanced ───────────────────────────────────────
         row_idx = self._build_advanced_section(row_idx)
+
+        # ── Section 5: Text Replacement ────────────────────────────────
+        row_idx = self._build_text_replacement_section(row_idx)
+
+        # ── Section 6: Download Records ────────────────────────────────
+        row_idx = self._build_delete_records_section(row_idx)
 
         # ── Bottom bar: Save / Reset ──────────────────────────────────
         self._build_bottom_bar()
@@ -546,6 +554,176 @@ class SettingsFrame(ctk.CTkFrame):
 
     # ──────────────────────────────────────────────────────────────────
 
+    def _build_text_replacement_section(self, row: int) -> int:
+        """Section 5 — old→new text-replacement rules for file names."""
+        lbl = _section_label(self._scroll, "🔤  Text Replacement")
+        lbl.grid(row=row, column=0, sticky="w", pady=(Theme.PAD_LG, Theme.PAD_SM))
+        row += 1
+
+        card = ctk.CTkFrame(self._scroll, fg_color=Theme.BG_CARD, corner_radius=Theme.RADIUS_MD)
+        card.grid(row=row, column=0, sticky="ew", pady=Theme.PAD_XS)
+        card.grid_columnconfigure(0, weight=1)
+        row += 1
+
+        ctk.CTkLabel(
+            card, text="Add from → to pairs. These rules are applied to file names.",
+            font=Theme.FONT_SMALL, text_color=Theme.TEXT_MUTED, anchor="w",
+        ).grid(row=0, column=0, padx=Theme.PAD_MD, pady=(Theme.PAD_SM, 0), sticky="w")
+
+        # Container for rule rows
+        self._tr_rows_frame = ctk.CTkFrame(card, fg_color="transparent")
+        self._tr_rows_frame.grid(row=1, column=0, sticky="ew", padx=Theme.PAD_SM, pady=Theme.PAD_XS)
+        self._tr_rows_frame.grid_columnconfigure(0, weight=1)
+        self._tr_rows_frame.grid_columnconfigure(1, weight=1)
+
+        self._tr_rows: list[dict] = []  # [{"from": CTkEntry, "to": CTkEntry, "frame": CTkFrame}]
+
+        ctk.CTkButton(
+            card, text="+ Add Rule", width=120,
+            font=Theme.FONT_SMALL,
+            fg_color=Theme.ACCENT, hover_color=Theme.ACCENT_HOVER,
+            command=self._add_tr_row,
+        ).grid(row=2, column=0, padx=Theme.PAD_MD, pady=Theme.PAD_SM, sticky="w")
+
+        return row
+
+    def _add_tr_row(self, from_val: str = "", to_val: str = "") -> None:
+        """Append a text-replacement row."""
+        idx = len(self._tr_rows)
+        fr = ctk.CTkFrame(self._tr_rows_frame, fg_color="transparent")
+        fr.grid(row=idx, column=0, columnspan=3, sticky="ew", pady=2)
+        fr.grid_columnconfigure(0, weight=1)
+        fr.grid_columnconfigure(1, weight=1)
+
+        entry_from = ctk.CTkEntry(
+            fr, placeholder_text="Find…",
+            font=Theme.FONT_MONO, fg_color=Theme.BG_INPUT,
+            text_color=Theme.TEXT_PRIMARY, border_color=Theme.BG_HOVER,
+        )
+        entry_from.grid(row=0, column=0, padx=(0, 4), sticky="ew")
+        if from_val:
+            entry_from.insert(0, from_val)
+
+        ctk.CTkLabel(fr, text="→", font=Theme.FONT_BODY,
+                     text_color=Theme.TEXT_MUTED).grid(row=0, column=1, padx=4)
+
+        entry_to = ctk.CTkEntry(
+            fr, placeholder_text="Replace with…",
+            font=Theme.FONT_MONO, fg_color=Theme.BG_INPUT,
+            text_color=Theme.TEXT_PRIMARY, border_color=Theme.BG_HOVER,
+        )
+        entry_to.grid(row=0, column=2, padx=(4, 4), sticky="ew")
+        if to_val:
+            entry_to.insert(0, to_val)
+
+        row_data = {"from": entry_from, "to": entry_to, "frame": fr}
+
+        btn_del = ctk.CTkButton(
+            fr, text="✕", width=30,
+            font=Theme.FONT_SMALL,
+            fg_color=Theme.ERROR, hover_color=Theme.BG_HOVER,
+            command=lambda rd=row_data: self._remove_tr_row(rd),
+        )
+        btn_del.grid(row=0, column=3, padx=(4, 0))
+
+        self._tr_rows.append(row_data)
+
+    def _remove_tr_row(self, row_data: dict) -> None:
+        """Remove a single text-replacement row."""
+        row_data["frame"].destroy()
+        self._tr_rows.remove(row_data)
+        # Re-grid remaining rows
+        for i, rd in enumerate(self._tr_rows):
+            rd["frame"].grid(row=i)
+
+    # ──────────────────────────────────────────────────────────────────
+
+    def _build_delete_records_section(self, row: int) -> int:
+        """Section 6 — delete download records by work ID."""
+        lbl = _section_label(self._scroll, "🗑  Download Records")
+        lbl.grid(row=row, column=0, sticky="w", pady=(Theme.PAD_LG, Theme.PAD_SM))
+        row += 1
+
+        card = ctk.CTkFrame(self._scroll, fg_color=Theme.BG_CARD, corner_radius=Theme.RADIUS_MD)
+        card.grid(row=row, column=0, sticky="ew", pady=Theme.PAD_XS)
+        card.grid_columnconfigure(1, weight=1)
+        row += 1
+        r = 0
+
+        ctk.CTkLabel(
+            card, text="Work IDs", font=Theme.FONT_BODY,
+            text_color=Theme.TEXT_SECONDARY, width=180, anchor="w",
+        ).grid(row=r, column=0, padx=Theme.PAD_MD, pady=Theme.PAD_SM, sticky="w")
+
+        self._widgets["delete_ids"] = ctk.CTkEntry(
+            card, placeholder_text='Space-separated IDs or "ALL"',
+            font=Theme.FONT_MONO, fg_color=Theme.BG_INPUT,
+            text_color=Theme.TEXT_PRIMARY, border_color=Theme.BG_HOVER,
+        )
+        self._widgets["delete_ids"].grid(row=r, column=1, padx=Theme.PAD_SM, pady=Theme.PAD_SM, sticky="ew")
+        r += 1
+
+        btn_row = ctk.CTkFrame(card, fg_color="transparent")
+        btn_row.grid(row=r, column=0, columnspan=2, padx=Theme.PAD_MD, pady=Theme.PAD_SM, sticky="w")
+
+        ctk.CTkButton(
+            btn_row, text="🗑 Delete Records", width=150,
+            font=Theme.FONT_BODY,
+            fg_color=Theme.ERROR, hover_color=Theme.ACCENT_HOVER,
+            command=self._delete_records,
+        ).grid(row=0, column=0)
+
+        self._delete_status_label = ctk.CTkLabel(
+            btn_row, text="", font=Theme.FONT_SMALL,
+            text_color=Theme.TEXT_MUTED, anchor="w",
+        )
+        self._delete_status_label.grid(row=0, column=1, padx=(Theme.PAD_SM, 0))
+        r += 1
+
+        return row
+
+    def _delete_records(self) -> None:
+        """Invoke backend's DownloadRecorder.delete_ids."""
+        ids_text = self._widgets["delete_ids"].get().strip()
+        if not ids_text:
+            self._delete_status_label.configure(
+                text="⚠ Enter IDs or \"ALL\"", text_color=Theme.WARNING,
+            )
+            return
+
+        app = self._app
+        if not app or not hasattr(app, "backend") or not app.backend.is_ready:
+            self._delete_status_label.configure(
+                text="❌ Backend not ready", text_color=Theme.ERROR,
+            )
+            return
+
+        recorder = getattr(app.backend, "recorder", None)
+        if recorder is None or not recorder.switch:
+            self._delete_status_label.configure(
+                text="❌ Download-record feature is disabled",
+                text_color=Theme.ERROR,
+            )
+            return
+
+        async def _do_delete():
+            await recorder.delete_ids(ids_text)
+
+        try:
+            import asyncio
+            asyncio.get_event_loop().create_task(_do_delete())
+            self._delete_status_label.configure(
+                text=f"✅ Delete request sent for: {ids_text}",
+                text_color=Theme.SUCCESS,
+            )
+            self._log(f"🗑 Delete records: {ids_text}")
+        except Exception as exc:
+            self._delete_status_label.configure(
+                text=f"❌ {exc}", text_color=Theme.ERROR,
+            )
+
+    # ──────────────────────────────────────────────────────────────────
+
     def _build_bottom_bar(self) -> None:
         bar = ctk.CTkFrame(self, fg_color=Theme.BG_SECONDARY, corner_radius=0, height=56)
         bar.grid(row=1, column=0, sticky="ew", padx=0, pady=0)
@@ -627,6 +805,12 @@ class SettingsFrame(ctk.CTkFrame):
         display = {"": "(none)", "csv": "CSV", "xlsx": "XLSX"}.get(sf, "(none)")
         self._widgets["storage_format"].set(display)
 
+        # Text replacement rules
+        for rd in list(self._tr_rows):
+            self._remove_tr_row(rd)
+        for old, new in data.get("text_replacement", []):
+            self._add_tr_row(old, new)
+
     def _collect_settings(self) -> dict:
         """Read all widget values into a settings dict."""
         data = _read_settings() or {}
@@ -664,6 +848,15 @@ class SettingsFrame(ctk.CTkFrame):
         sf_map = {"(none)": "", "CSV": "csv", "XLSX": "xlsx"}
         sf_raw = self._widgets["storage_format"].get()
         data["storage_format"] = sf_map.get(sf_raw, "")
+
+        # Text replacement rules
+        rules = []
+        for rd in self._tr_rows:
+            old = rd["from"].get().strip()
+            new = rd["to"].get().strip()
+            if old:  # skip empty "from" entries
+                rules.append([old, new])
+        data["text_replacement"] = rules
 
         return data
 

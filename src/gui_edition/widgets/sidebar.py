@@ -38,6 +38,7 @@ class Sidebar(ctk.CTkFrame):
         self._buttons: Dict[str, ctk.CTkButton] = {}
         self._active: Optional[str] = None
 
+        # Rows: 0=logo, 1..N=nav, N+1=spacer(weight), N+2=about, N+3=version
         self.grid_rowconfigure(len(NAV_ITEMS) + 1, weight=1)  # spacer row
         self.grid_columnconfigure(0, weight=1)
 
@@ -76,6 +77,25 @@ class Sidebar(ctk.CTkFrame):
             )
             self._buttons[nav_id] = btn
 
+        # ── About button (pinned near bottom) ─────────────────────────
+        about_btn = ctk.CTkButton(
+            self,
+            text="ℹ️  About",
+            font=Theme.FONT_BODY,
+            fg_color="transparent",
+            text_color=Theme.TEXT_SECONDARY,
+            hover_color=Theme.SIDEBAR_BTN_HOVER,
+            anchor="w",
+            height=36,
+            corner_radius=Theme.RADIUS_SM,
+            command=self._open_about,
+        )
+        about_btn.grid(
+            row=len(NAV_ITEMS) + 2, column=0,
+            padx=Theme.PAD_SM, pady=(0, 2),
+            sticky="ew",
+        )
+
         # ── Version label (bottom) ────────────────────────────────────
         try:
             from src.custom import VERSION_MAJOR, VERSION_MINOR
@@ -89,7 +109,7 @@ class Sidebar(ctk.CTkFrame):
             text_color=Theme.TEXT_MUTED,
         )
         self._version_label.grid(
-            row=len(NAV_ITEMS) + 2, column=0,
+            row=len(NAV_ITEMS) + 3, column=0,
             padx=Theme.PAD_MD, pady=(0, Theme.PAD_MD),
             sticky="s",
         )
@@ -118,3 +138,9 @@ class Sidebar(ctk.CTkFrame):
                 text_color=Theme.TEXT_PRIMARY,
             )
             self._active = nav_id
+
+    def _open_about(self) -> None:
+        """Open the About dialog."""
+        from .about_dialog import AboutDialog
+        AboutDialog(self.winfo_toplevel())
+
