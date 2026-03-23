@@ -152,11 +152,11 @@ class App(ctk.CTk):
         self._status_bar.set_message("Ready")
         self._status_bar.set_cookie_status(
             "Douyin",
-            bool(self.backend.parameter and self.backend.parameter.cookie),
+            bool(self.backend.parameter and self.backend.parameter.cookie_state),
         )
         self._status_bar.set_cookie_status(
             "TikTok",
-            bool(self.backend.parameter and self.backend.parameter.cookie_tiktok),
+            bool(self.backend.parameter and self.backend.parameter.cookie_tiktok_state),
         )
         # Update FFmpeg indicator
         ffmpeg_ok = bool(
