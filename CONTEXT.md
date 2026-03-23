@@ -3,7 +3,7 @@
 > **Mục đích:** File này ghi lại toàn bộ những gì đã tìm hiểu và quyết định trong quá trình phát triển,
 > để khi sang session mới vẫn có thể tiếp tục mà không mất ngữ cảnh.
 >
-> **Cập nhật lần cuối:** 2026-03-23 (Phase 1 GUI done)
+> **Cập nhật lần cuối:** 2026-03-24 (All 8 phases GUI complete ✅)
 
 ---
 
@@ -33,7 +33,7 @@
   - `manager/` — Database + DownloadRecorder
   - `module/` — Cookie management
   - `custom/` — Constants
-  - `gui_edition/` — 🟡 ĐANG PHÁT TRIỂN (CustomTkinter desktop app)
+  - `gui_edition/` — ✅ HOÀN THÀNH (CustomTkinter desktop app, 16 modules)
   - `tui_edition/` — ⛔ Stub classes rỗng
   - `cli_edition/` — CLI utilities
   - `testers/` — Testing utilities
@@ -55,7 +55,7 @@
 ## 2. Phân Tích Web UI / App UI
 
 ### Kết luận phân tích `gui_edition/`
-- `gui_edition/` — **0% hoàn thành**, chỉ có `__init__.py` trống
+- `gui_edition/` — **100% hoàn thành** (8 phases, 16 modules, ~120KB code)
 - `tui_edition/` — **0% hoàn thành**, chỉ có `class App: pass` và `class Setting: pass`
 - Menu "Web UI 模式" → trỏ đến `disable_function()` hiển thị "đang tái cấu trúc"
 - `__web_ui_object` — đã bị xóa hoàn toàn, chỉ còn comment
@@ -134,22 +134,38 @@
 
 ---
 
-## 2.5 GUI Desktop — Tiến Độ Phát Triển
+## 2.5 GUI Desktop — Tiến Độ Phát Triển (HOÀN THÀNH ✅)
 
 **Tài liệu cấu trúc:** `src/gui_edition/GUI_STRUCTURE.md`
 
-### Files đã tạo (Phase 1 — Foundation)
+### Tất cả files đã tạo (Phase 1–8)
 
-| File | Vai trò |
-|---|---|
-| `gui_edition/__init__.py` | Package init, export `App` |
-| `gui_edition/async_handler.py` | Background asyncio loop ↔ GUI thread bridge |
-| `gui_edition/console_adapter.py` | `GUIConsole` thay thế `ColorfulConsole` cho GUI |
-| `gui_edition/frames/__init__.py` | Frames package init |
+| Category | Files | Tổng size |
+|----------|-------|-----------|
+| **Core** | `__init__.py`, `app.py`, `async_handler.py`, `backend_bootstrap.py`, `console_adapter.py`, `coroutine_factory.py`, `download_manager.py`, `gui_main.py`, `theme.py` | ~39KB |
+| **Frames** | `download_frame.py` (39KB), `settings_frame.py` (43KB), `monitor_frame.py` (12KB) | ~94KB |
+| **Widgets** | `sidebar.py`, `log_panel.py`, `progress_card.py`, `url_input.py`, `status_bar.py`, `error_dialog.py`, `about_dialog.py` | ~31KB |
+| **Packaging** | `gui_launcher.py`, `gui.spec` | ~2KB |
+| **Tests** | `tests/test_gui_smoke.py`, `tests/test_gui_launch.py` | ~6KB |
 
 ### Dependencies thêm mới
 - `customtkinter>=5.2.0` — Modern dark-mode Tkinter
 - `Pillow>=10.0.0` — Image support cho logo/icon
+
+### Tính năng đã implement
+
+| Category | Count | Chi tiết |
+|----------|-------|---------|
+| Download modes | 15 | 11 Douyin + 4 TikTok (Account/Link/Mix/Live/Collection/Collects/Music/Comment/User/Hot/Search×4) |
+| Settings controls | 20+ | Cookie, proxy, format, toggles, paths, text replace, record delete |
+| Monitor | 6 | Clipboard listener, queue counters, log, stop, clear, reset |
+| UI components | 7 | Sidebar, LogPanel, ProgressCard, URLInput, StatusBar, ErrorDialog, AboutDialog |
+| Backend integration | 4 | BackendBootstrap, CoroutineFactory, DownloadManager, periodic cookie refresh |
+
+### Deferred features (🟡)
+- Check update button — cần API endpoint
+- Language switch — backend i18n phức tạp, ít giá trị cho GUI
+- Web API server toggle — chạy riêng bằng CLI
 
 ---
 
@@ -191,35 +207,70 @@
 
 ## 3. Việc Đã Làm
 
+### Nghiên cứu & Phân tích
 - [x] Đọc & phân tích toàn bộ cấu trúc project (19 packages)
 - [x] Đọc `README.md`, `main.py`, `pyproject.toml`
 - [x] Đọc code `TikTokDownloader.py` (463 dòng — lớp chính)
-- [x] Kiểm tra `gui_edition/`, `tui_edition/`, `static/` → đều trống
-- [x] Tìm kiếm references Web UI trong toàn bộ codebase → không có
-- [x] Tạo `PROJECT_OVERVIEW.md` — tài liệu tổng quan
-- [x] Tạo `CONTEXT.md` — file ngữ cảnh này
-- [x] Phân tích `main_server.py` (762 dòng) — 16 endpoints, thiếu download
-- [x] So sánh Web UI vs Mobile App → Web UI thắng
-- [x] So sánh Web UI vs Desktop App → Desktop chọn cho native feel
-- [x] Phân tích 3 hướng Desktop (Electron/Tauri, Python native, Web local)
-- [x] Quyết định: Python Native GUI (CustomTkinter)
-- [x] Tạo `GUI_STRUCTURE.md` — cấu trúc project desktop app
-- [x] **Phase 1 Foundation:** `async_handler.py`, `console_adapter.py`, deps
+- [x] Phân tích `main_server.py` (762 dòng) — 16 endpoints
+- [x] So sánh Web UI vs Mobile App vs Desktop App → Desktop (CustomTkinter)
+- [x] Tạo `PROJECT_OVERVIEW.md`, `CONTEXT.md`, `GUI_STRUCTURE.md`
 
-## 4. Việc Cần Làm Tiếp
+### Phase 1: Foundation ✅
+- [x] `async_handler.py` — thread-safe asyncio ↔ GUI bridge
+- [x] `console_adapter.py` — GUIConsole thay thế Rich
+- [x] Dependencies: `customtkinter>=5.2.0`, `Pillow>=10.0.0`
 
-- [ ] Viết `gui_edition/theme.py` — bảng màu, font tokens
-- [ ] Viết `gui_edition/app.py` — cửa sổ chính + sidebar nav + status bar
-- [ ] Viết `gui_edition/widgets/` — LogPanel, ProgressCard, URLInput, Sidebar
-- [ ] Viết `gui_edition/frames/download_frame.py` — tab Download
-- [ ] Viết `gui_edition/frames/settings_frame.py` — tab Settings
-- [ ] Viết `gui_edition/frames/monitor_frame.py` — tab Monitor
-- [ ] Tạo `gui_main.py` — entry point
-- [ ] Cookie management UI (paste + auto-detect từ browser)
-- [ ] Download progress tracking (progress bar + log)
-- [ ] Tích hợp backend (`TikTok`, `Parameter`, `Database`)
-- [ ] Đóng gói PyInstaller → `.exe`
-- [ ] Testing
+### Phase 2: Core UI Shell ✅
+- [x] `theme.py` — dark mode tokens
+- [x] `app.py` — CTk window 800×600, sidebar, status bar
+- [x] `widgets/` — Sidebar, LogPanel, URLInput, ProgressCard, StatusBar
+- [x] `gui_main.py` entry point
+- [x] Frame stubs: download, settings, monitor
+
+### Phase 3: SettingsFrame ✅
+- [x] Cookie management (paste + browser import via rookiepy)
+- [x] Directory picker, storage format, platform toggles
+- [x] Proxy, name format, folder mode, advanced settings
+- [x] Text replacement rules (Section 5)
+- [x] Delete download records (Section 6)
+- [x] Save / Reset buttons
+
+### Phase 4: DownloadFrame P1 ✅
+- [x] Platform toggle (Douyin ↔ TikTok)
+- [x] Tabs: Account, Link, Mix
+- [x] Download progress integration + queue management
+- [x] `download_manager.py` — TaskInfo/TaskStatus/DownloadManager
+
+### Phase 5: DownloadFrame P2 ✅
+- [x] Tabs: Live, Collection (3 actions), Data (Comment/User/Hot), Search (4 channels)
+- [x] `_UnavailableOverlay` for Douyin-only tabs when TikTok selected
+- [x] `coroutine_factory.py` — 11 factory functions
+
+### Phase 6: MonitorFrame ✅
+- [x] Clipboard listener toggle, auto-detect links, queue counters
+- [x] Log panel, stop button, clear/reset, clean shutdown
+
+### Phase 7: Integration & Polish ✅
+- [x] `backend_bootstrap.py` — Database/Settings/Cookie/Parameter init
+- [x] Coroutine wiring (all 11 modes → download_manager)
+- [x] Periodic cookie refresh (daemon thread)
+- [x] FFmpeg status indicator
+- [x] `error_dialog.py` + `about_dialog.py`
+
+### Phase 8: Packaging & Testing ✅
+- [x] `gui_launcher.py` + `gui.spec` (PyInstaller one-dir windowed)
+- [x] `--gui` flag in `main.py`
+- [x] `test_gui_smoke.py` — 31 passed, 7 skipped, 0 failed
+- [x] `test_gui_launch.py` — manual launch auto-destroy
+- [x] Lazy `__init__.py` to avoid cascading imports
+
+## 4. Việc Còn Lại (Deferred / Future)
+
+- [ ] Check update button (cần API endpoint để so sánh version)
+- [ ] Language switch UI (backend i18n bằng gettext, phức tạp)
+- [ ] Web API server toggle từ GUI (hiện chạy riêng `main.py api`)
+- [ ] Cross-platform test macOS / Linux (cần CI hoặc máy tương ứng)
+- [ ] Assets: icon.ico, icon.png, logo.png (placeholder)
 
 ---
 
@@ -235,7 +286,7 @@
 | `src/downloader/download.py` (30KB) | Download engine — cần wrap thành API |
 | `src/manager/database.py` (145 dòng) | DB schema, CRUD — GUI dùng lại trực tiếp |
 | `PROJECT_OVERVIEW.md` | Tổng quan project |
-| `gui_edition/GUI_STRUCTURE.md` | Cấu trúc + danh sách tính năng — **bắt buộc tuân thủ** |
+| `gui_edition/GUI_STRUCTURE.md` | Cấu trúc + trạng thái tính năng — **bắt buộc tuân thủ** |
 
 ---
 

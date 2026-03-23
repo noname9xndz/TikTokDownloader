@@ -2,37 +2,110 @@
 
 > **Mục đích:** Tài liệu chuẩn cấu trúc thư mục & module cho GUI Desktop.
 > Mọi file mới phải tuân thủ cấu trúc này.
+>
+> **Cập nhật lần cuối:** 2026-03-24 — All 8 phases complete ✅
 
 ---
 
-## Cây thư mục
+## Trạng thái tổng quan
+
+| Phase | Nội dung | Status |
+|-------|----------|--------|
+| 1 | Foundation — async bridge, console adapter, deps | ✅ Done |
+| 2 | Core UI Shell — window, sidebar, status bar, widgets, frames | ✅ Done |
+| 3 | SettingsFrame — cookie, directory, proxy, format, toggles | ✅ Done |
+| 4 | DownloadFrame P1 — Account/Link/Mix tabs + progress | ✅ Done |
+| 5 | DownloadFrame P2 — Live/Collection/Data/Search tabs | ✅ Done |
+| 6 | MonitorFrame — clipboard listener, queue, log | ✅ Done |
+| 7 | Integration — backend bootstrap, coroutine wiring, error/about dialogs | ✅ Done |
+| 8 | Packaging & Testing — PyInstaller spec, smoke tests, `--gui` flag | ✅ Done |
+
+---
+
+## Cây thư mục (thực tế)
 
 ```
 src/gui_edition/
-├── __init__.py              # Export App class
-├── app.py                   # 🔑 MAIN — CTk window, sidebar nav, status bar
+├── __init__.py              # Lazy export App (tránh cascading imports)
+├── app.py                   # 🔑 MAIN — CTk window, sidebar nav, status bar, backend init
 ├── async_handler.py         # Thread-safe asyncio ↔ GUI bridge
+├── backend_bootstrap.py     # Khởi tạo Database/Settings/Cookie/Parameter
 ├── console_adapter.py       # GUIConsole thay thế Rich ColorfulConsole
+├── coroutine_factory.py     # 11 factory functions tạo backend coroutines
+├── download_manager.py      # TaskInfo/TaskStatus/DownloadManager — job queue
+├── gui_main.py              # Entry point: App().run()
 ├── theme.py                 # Bảng màu, font, spacing tokens (dark mode)
+├── GUI_STRUCTURE.md          # ← File này
 │
 ├── frames/                  # Các tab/page chính
-│   ├── __init__.py
-│   ├── download_frame.py    # Tab Download — URL input, batch, progress bars
-│   ├── settings_frame.py    # Tab Settings — thư mục lưu, proxy, cookie, format
-│   └── monitor_frame.py     # Tab Monitor  — clipboard monitor ON/OFF + log
+│   ├── __init__.py          # Export 3 frames
+│   ├── download_frame.py    # 7 tabs: Account/Link/Mix/Live/Collection/Data/Search (39KB)
+│   ├── settings_frame.py    # 6 sections: Cookie/Directory/Format/Advanced/TextReplace/Records (43KB)
+│   └── monitor_frame.py     # Clipboard listener + queue counters + log (12KB)
 │
 ├── widgets/                 # Widget tái sử dụng
-│   ├── __init__.py
+│   ├── __init__.py          # Export tất cả widgets
+│   ├── about_dialog.py      # Dialog About — version, author, GitHub link
+│   ├── error_dialog.py      # Modal hiển thị lỗi không block
 │   ├── log_panel.py         # CTkTextbox + colour tags — nhận output từ GUIConsole
 │   ├── progress_card.py     # Card hiển thị download progress + filename + speed
-│   ├── url_input.py         # CTkEntry + paste button + validate
-│   └── sidebar.py           # Sidebar navigation buttons + logo
+│   ├── sidebar.py           # Sidebar navigation buttons + logo + About button
+│   ├── status_bar.py        # Cookie/FFmpeg indicators + message
+│   └── url_input.py         # CTkEntry + paste button + validate
 │
-└── assets/                  # Tài nguyên tĩnh
-    ├── icon.ico             # App icon cho Windows
-    ├── icon.png             # App icon cho macOS/Linux
-    └── logo.png             # Logo hiển thị trên sidebar
+└── assets/                  # Tài nguyên tĩnh (placeholder)
+    ├── icon.ico
+    ├── icon.png
+    └── logo.png
+
+Root-level files:
+├── gui_launcher.py          # PyInstaller entry point
+├── gui.spec                 # PyInstaller one-dir windowed spec
+└── tests/
+    ├── test_gui_smoke.py    # 38 smoke tests (31 passed, 7 skipped)
+    └── test_gui_launch.py   # Manual launch test (auto-destroy 10s)
 ```
+
+**Tổng cộng:** 16 Python modules (10 core + 3 frames + 7 widgets + 2 `__init__`)
+
+---
+
+## Chi tiết modules
+
+### Core (10 files)
+
+| File | Lines | Vai trò |
+|------|-------|---------|
+| `app.py` | ~250 | CTk window 800×600, sidebar routing, backend init, shutdown |
+| `async_handler.py` | ~70 | Background `asyncio` loop thread, `run_async(coro, on_done, on_error)` |
+| `backend_bootstrap.py` | ~200 | Mirrors `TikTokDownloader.__init__` → `__aenter__` chain |
+| `console_adapter.py` | ~100 | `GUIConsole` — drop-in replacement for `ColorfulConsole` |
+| `coroutine_factory.py` | ~260 | 11 factory functions tạo backend download coroutines |
+| `download_manager.py` | ~130 | `TaskInfo` dataclass, `TaskStatus` enum, `DownloadManager` queue |
+| `gui_main.py` | ~25 | Entry point: `App().run()` |
+| `theme.py` | ~90 | `COLORS`, `FONTS`, `SPACING`, `CORNER_RADIUS` tokens |
+| `__init__.py` | ~8 | Lazy `__getattr__` export `App` |
+| `GUI_STRUCTURE.md` | — | Tài liệu cấu trúc (file này) |
+
+### Frames (3 files)
+
+| File | Lines | Tabs / Sections |
+|------|-------|-----------------|
+| `download_frame.py` | ~1050 | **7 tabs:** Account, Link, Mix, Live, Collection, Data, Search |
+| `settings_frame.py` | ~1150 | **6 sections:** Cookie, Directory/Format, Download toggles, Advanced, Text Replace, Records |
+| `monitor_frame.py` | ~320 | Clipboard listener toggle, queue counters, embedded LogPanel |
+
+### Widgets (7 files)
+
+| File | Lines | Vai trò |
+|------|-------|---------|
+| `sidebar.py` | ~140 | 4 nav buttons (Download/Settings/Monitor/About) + logo |
+| `log_panel.py` | ~120 | Scrollable text log, colour tags (INFO/WARNING/ERROR) |
+| `progress_card.py` | ~140 | Download card: filename, %, speed, cancel button |
+| `url_input.py` | ~130 | Multi-line text input, paste button, load .txt |
+| `status_bar.py` | ~85 | Cookie Douyin/TikTok + FFmpeg indicators + message |
+| `error_dialog.py` | ~95 | Themed modal dialog for errors |
+| `about_dialog.py` | ~190 | Version, author, links, license info |
 
 ---
 
@@ -40,13 +113,16 @@ src/gui_edition/
 
 ### 1. Phân tách trách nhiệm
 
-| Layer | Vai trò | Ví dụ |
-|---|---|---|
-| **app.py** | Window lifecycle, sidebar routing, status bar | `App.run()`, `App._switch_frame()` |
-| **frames/** | UI layout cho từng tính năng, gọi async operations | `DownloadFrame._start_download()` |
-| **widgets/** | Component nhỏ, tái sử dụng, stateless | `ProgressCard.update(percent, speed)` |
-| **async_handler.py** | Bridge async ↔ Tk main thread | `handler.run_async(coro, on_done)` |
-| **console_adapter.py** | Redirect console output → LogPanel | `GUIConsole.info("Done")` |
+| Layer | Vai trò |
+|-------|---------|
+| `app.py` | Window lifecycle, sidebar routing, status bar, backend init/shutdown |
+| `frames/` | UI layout cho từng tính năng, gọi backend qua `download_manager` |
+| `widgets/` | Component nhỏ, tái sử dụng |
+| `async_handler.py` | Bridge async ↔ Tk main thread |
+| `console_adapter.py` | Redirect console output → LogPanel |
+| `backend_bootstrap.py` | Khởi tạo Database/Settings/Cookie/Parameter |
+| `coroutine_factory.py` | Tạo async callables cho download_manager.submit() |
+| `download_manager.py` | Job queue, task lifecycle (QUEUED→RUNNING→DONE/ERROR/CANCELLED) |
 
 ### 2. Luồng async (bắt buộc)
 
@@ -54,8 +130,9 @@ src/gui_edition/
 [GUI thread]                    [Background asyncio loop]
     │                                    │
     ├─ user click "Download" ───────────►│
-    │                                    ├─ await TikTok.detail_interactive()
-    │                                    ├─ await Downloader.run()
+    │  → manager.submit(factory)         ├─ await factory(urls)
+    │                                    ├─  → TikTok.detail_interactive()
+    │                                    ├─  → Downloader.run()
     │◄── root.after(0, on_done) ────────┤
     ├─ update ProgressCard               │
     └─ enable button                     │
@@ -65,34 +142,28 @@ src/gui_edition/
 - Luôn dùng `AsyncHandler.run_async(coro, on_done, on_error)`
 - Callback `on_done`/`on_error` chạy trên GUI thread (safe để update widget)
 
-### 3. Tương tác với backend hiện tại
+### 3. Backend integration flow
 
 ```python
-# app.py khởi tạo backend giống TikTokDownloader.__init__()
-self.database = Database()
-await self.database.__aenter__()
+# app.py startup:
+self.backend = BackendBootstrap(self.console)
+self.ah.run_async(self.backend.start(), on_done=self._on_backend_ready)
 
-self.settings = Settings(PROJECT_ROOT, self.gui_console)
-self.cookie = Cookie(self.settings, self.gui_console)
+# download_frame.py khi user click Start:
+factory = coroutine_factory.make_link_factory(backend, platform)
+manager.submit("link", platform, urls, backend_coro_factory=factory)
 
-# Tạo Parameter
-self.parameter = Parameter(
-    self.settings,
-    self.cookie,
-    logger=logger,
-    console=self.gui_console,  # <-- GUIConsole thay ColorfulConsole
-    **self.settings.read(),
-    recorder=recorder,
-)
-
-# Dùng TikTok class cho logic
-self.tiktok = TikTok(self.parameter, self.database)
+# coroutine_factory.py:
+def make_link_factory(backend, platform):
+    async def _factory(urls):
+        tiktok = TikTok(backend.parameter, backend.database)
+        await tiktok.detail_interactive(urls)
+    return _factory
 ```
 
 ### 4. Theme (Dark Mode mặc định)
 
 ```python
-# theme.py
 COLORS = {
     "bg_primary":    "#1a1a2e",   # Nền chính
     "bg_secondary":  "#16213e",   # Sidebar / card
@@ -105,29 +176,27 @@ COLORS = {
     "error":         "#ff1744",
     "info":          "#40c4ff",
 }
-FONT_FAMILY = "Segoe UI"       # Windows; fallback Helvetica
-FONT_SIZE_NORMAL = 13
-FONT_SIZE_TITLE  = 18
-CORNER_RADIUS    = 10
 ```
 
 ### 5. Naming conventions
 
 - File: `snake_case.py`
-- Class: `PascalCase` (ví dụ `DownloadFrame`, `ProgressCard`)
-- Widget ID / attribute: `self._widget_name` (private prefix)
+- Class: `PascalCase` (`DownloadFrame`, `ProgressCard`)
+- Widget attribute: `self._widget_name` (private prefix)
 - Callback: `self._on_event_name()` hoặc `self._handle_action()`
-- Async bridge: `self._start_xxx()` gọi `handler.run_async()`
+- Async bridge: `self._start_xxx()` → `handler.run_async()`
 
-### 6. Entry point
+### 6. Entry points
 
-```python
-# gui_main.py (root project)
-from src.gui_edition import App
+```bash
+# Từ main.py (có --gui flag):
+python main.py --gui
 
-if __name__ == "__main__":
-    app = App()
-    app.run()
+# Trực tiếp:
+python -m src.gui_edition.gui_main
+
+# PyInstaller:
+pyinstaller gui.spec
 ```
 
 ---
@@ -136,22 +205,117 @@ if __name__ == "__main__":
 
 ```mermaid
 graph TD
-    A[gui_main.py] --> B[app.py]
+    A[gui_launcher.py / gui_main.py] --> B[app.py]
     B --> C[AsyncHandler]
     B --> D[GUIConsole]
-    B --> E[Sidebar widget]
+    B --> BB[BackendBootstrap]
+    B --> E[Sidebar]
+    B --> SB[StatusBar]
     B --> F1[DownloadFrame]
     B --> F2[SettingsFrame]
     B --> F3[MonitorFrame]
+
+    F1 --> DM[DownloadManager]
+    F1 --> CF[CoroutineFactory]
     F1 --> G1[ProgressCard]
     F1 --> G2[URLInput]
     F1 --> G3[LogPanel]
+
     F2 --> G3
     F3 --> G3
+
     D --> G3
-    C --> H[TikTok / Parameter / Database]
+    DM --> C
+    CF --> H[TikTok / Parameter / Database]
+    BB --> H
     H --> I[src/ backend modules]
 ```
+
+---
+
+## Danh sách tính năng — Trạng thái hoàn thành
+
+> Ký hiệu: ✅ = đã implement, 🟡 = deferred/partial
+
+### A. Main Menu — Từ `TikTokDownloader` class
+
+| # | Tính năng | GUI Location | Status |
+|---|-----------|-------------|--------|
+| 1 | Cookie Douyin từ clipboard | SettingsFrame Section 1 | ✅ |
+| 2 | Cookie Douyin từ browser | SettingsFrame Section 1 (rookiepy) | ✅ |
+| 3 | Cookie TikTok từ clipboard | SettingsFrame Section 1 | ✅ |
+| 4 | Cookie TikTok từ browser | SettingsFrame Section 1 (rookiepy) | ✅ |
+| 5 | Terminal interactive mode | DownloadFrame (7 tabs) | ✅ |
+| 6 | Monitor clipboard | MonitorFrame | ✅ |
+| 7 | Web API server | — | 🟡 Deferred (chạy riêng) |
+| 8 | Web UI mode | — | — Không áp dụng |
+| 9 | Toggle ghi log record | SettingsFrame Section 3 | ✅ |
+| 10 | Xóa download record | SettingsFrame Section 6 | ✅ |
+| 11 | Toggle ghi log file | SettingsFrame Section 3 | ✅ |
+| 12 | Check update | SettingsFrame | 🟡 Deferred |
+| 13 | Chuyển ngôn ngữ | — | 🟡 Deferred (backend i18n phức tạp) |
+
+### B. Download Modes — 11 Douyin + 4 TikTok + 4 Search
+
+| Mode | Tab | Platform | Coroutine Factory | Status |
+|------|-----|----------|------------------|--------|
+| Account batch | Account | Douyin+TikTok | `make_account_factory` | ✅ |
+| Link download | Link | Douyin+TikTok | `make_link_factory` | ✅ |
+| Mix/Collection | Mix | Douyin+TikTok | `make_mix_factory` | ✅ |
+| Live stream | Live | Douyin+TikTok | `make_live_factory` | ✅ |
+| Comment data | Data | Douyin | `make_comment_factory` | ✅ |
+| User data | Data | Douyin | `make_user_factory` | ✅ |
+| Hot/Trending | Data | Douyin | `make_hot_factory` | ✅ |
+| Collection (saved) | Collection | Douyin | `make_collection_factory` | ✅ |
+| Collects (folders) | Collection | Douyin | `make_collects_factory` | ✅ |
+| Collection music | Collection | Douyin | `make_collection_music_factory` | ✅ |
+| Search General | Search | Douyin | `make_search_factory` | ✅ |
+| Search Video | Search | Douyin | `make_search_factory` | ✅ |
+| Search User | Search | Douyin | `make_search_factory` | ✅ |
+| Search Live | Search | Douyin | `make_search_factory` | ✅ |
+
+### C. Monitor Mode
+
+| Tính năng | GUI Widget | Status |
+|-----------|-----------|--------|
+| Clipboard listener ON/OFF | MonitorFrame toggle button | ✅ |
+| Auto-detect Douyin/TikTok links | Keyword match in clipboard | ✅ |
+| Queue counters (Douyin/TikTok/Total) | MonitorFrame labels | ✅ |
+| Log processed links | Embedded LogPanel | ✅ |
+| Stop button | MonitorFrame button (replaces "close" trick) | ✅ |
+| Clear Log + Reset Counters | MonitorFrame buttons | ✅ |
+
+### D. Settings / Configuration
+
+| Tính năng | GUI Location | Status |
+|-----------|-------------|--------|
+| Thư mục lưu file | SettingsFrame Section 2 (folder picker) | ✅ |
+| Storage format (CSV/XLSX) | SettingsFrame Section 2 (dropdown) | ✅ |
+| Platform toggles (Douyin/TikTok) | SettingsFrame Section 2 | ✅ |
+| Proxy HTTP (Douyin + TikTok) | SettingsFrame Section 2 | ✅ |
+| Name format template | SettingsFrame Section 2 | ✅ |
+| Date format / split char | SettingsFrame Section 2 | ✅ |
+| Folder mode | SettingsFrame Section 2 | ✅ |
+| Chunk size / timeout / retry / pages | SettingsFrame Section 4 | ✅ |
+| Download type / music / cover toggles | SettingsFrame Section 3 | ✅ |
+| FFmpeg path / live qualities | SettingsFrame Section 4 | ✅ |
+| Desc/name length / truncate | SettingsFrame Section 4 | ✅ |
+| Text replacement rules | SettingsFrame Section 5 | ✅ |
+| Cookie state indicators | StatusBar (green/red) | ✅ |
+| FFmpeg indicator | StatusBar | ✅ |
+| Save / Reset buttons | SettingsFrame | ✅ |
+| Periodic cookie refresh | BackendBootstrap daemon thread | ✅ |
+
+### E. Extras
+
+| Tính năng | Location | Status |
+|-----------|----------|--------|
+| Error dialog | `widgets/error_dialog.py` | ✅ |
+| About dialog | `widgets/about_dialog.py` (via sidebar ℹ️) | ✅ |
+| `--gui` flag in `main.py` | `main.py` argparse | ✅ |
+| PyInstaller spec | `gui.spec` | ✅ |
+| Smoke tests (38 tests) | `tests/test_gui_smoke.py` | ✅ |
+| _UnavailableOverlay for Douyin-only tabs | DownloadFrame | ✅ |
 
 ---
 
@@ -163,102 +327,4 @@ graph TD
 - [ ] Console output qua `GUIConsole` (không dùng `print()` / Rich)?
 - [ ] Màu sắc lấy từ `theme.py` (không hardcode)?
 - [ ] Widget có `destroy()` / cleanup nếu cần?
-
----
-
-## Danh sách tính năng cần convert sang Desktop App
-
-> Nguồn: `TikTokDownloader.py` (Main Menu), `main_terminal.py` (Interactive Mode), `main_monitor.py` (Monitor Mode)
-> 
-> **Ký hiệu:** P1 = ưu tiên cao (MVP), P2 = quan trọng, P3 = có thì tốt
-
-### A. Main Menu — `TikTokDownloader` class
-
-| # | Tính năng (CLI) | Method | GUI Frame | Priority |
-|---|---|---|---|---|
-| 1 | Đọc Cookie từ clipboard (Douyin) | `write_cookie()` | `SettingsFrame` — nút "Paste Cookie Douyin" | P1 |
-| 2 | Đọc Cookie từ browser (Douyin) | `browser_cookie()` | `SettingsFrame` — dropdown chọn browser + nút Import | P1 |
-| 3 | Đọc Cookie từ clipboard (TikTok) | `write_cookie_tiktok()` | `SettingsFrame` — nút "Paste Cookie TikTok" | P1 |
-| 4 | Đọc Cookie từ browser (TikTok) | `browser_cookie_tiktok()` | `SettingsFrame` — dropdown chọn browser + nút Import | P1 |
-| 5 | Chế độ Terminal tương tác | `complete()` → `TikTok.run()` | `DownloadFrame` — tất cả sub-features bên dưới | P1 |
-| 6 | Chế độ Monitor clipboard | `monitor()` | `MonitorFrame` — toggle ON/OFF + log | P1 |
-| 7 | Chế độ Web API server | `server()` | `SettingsFrame` — nút Start/Stop API server | P3 |
-| 8 | Web UI mode (disabled) | `disable_function()` | — Bỏ qua (chưa implement ở CLI) | — |
-| 9 | Bật/tắt ghi log download record | `__modify_record()` | `SettingsFrame` — toggle switch | P2 |
-| 10 | Xóa download record | `delete_works_ids()` | `SettingsFrame` — input ID + nút Delete | P3 |
-| 11 | Bật/tắt ghi log file | `__modify_logging()` | `SettingsFrame` — toggle switch | P2 |
-| 12 | Kiểm tra update phiên bản | `check_update()` | `SettingsFrame` hoặc About dialog | P2 |
-| 13 | Chuyển ngôn ngữ (zh_CN ↔ en_US) | `_switch_language()` | `SettingsFrame` — dropdown Language | P1 |
-
-### B. Terminal Interactive Mode — `TikTok` class (15 tính năng chính)
-
-#### B1. Douyin (抖音) — 10 tính năng
-
-| # | Tính năng | Method | Input mode | GUI Widget | Priority |
-|---|---|---|---|---|---|
-| 1 | Batch download tác phẩm theo tài khoản | `account_acquisition_interactive()` | URL accounts / nhập tay / file .txt | `DownloadFrame` — tab "Account" | P1 |
-| 2 | Download tác phẩm theo link | `detail_interactive()` | Nhập link / file .txt | `DownloadFrame` — tab "Link" | P1 |
-| 3 | Lấy địa chỉ livestream | `live_interactive()` | Nhập link live | `DownloadFrame` — tab "Live" | P2 |
-| 4 | Thu thập dữ liệu comment | `comment_interactive()` | Nhập link / file .txt | `DownloadFrame` — tab "Data" | P2 |
-| 5 | Batch download tác phẩm theo hợp tuyển (Mix) | `mix_interactive()` | URL mix / collection list / nhập tay / file .txt | `DownloadFrame` — tab "Mix" | P1 |
-| 6 | Thu thập dữ liệu chi tiết tài khoản | `user_interactive()` | URL accounts / nhập tay / file .txt | `DownloadFrame` — tab "Data" | P2 |
-| 7 | Thu thập dữ liệu tìm kiếm | `search_interactive()` | Nhập keyword | `DownloadFrame` — tab "Search" | P2 |
-| 8 | Thu thập dữ liệu Hot/Trending | `hot_interactive()` | Không cần input | `DownloadFrame` — tab "Data" | P3 |
-| 9 | Batch download tác phẩm yêu thích (Collection) | `collection_interactive()` | Tự động (cookie required) | `DownloadFrame` — tab "Collection" | P2 |
-| 10 | Batch download nhạc yêu thích | `collection_music_interactive()` | Tự động (cookie required) | `DownloadFrame` — tab "Collection" | P3 |
-| 11 | Batch download tác phẩm từ thư mục yêu thích (Collects) | `collects_interactive()` | Tự động (cookie required) | `DownloadFrame` — tab "Collection" | P2 |
-
-#### B2. TikTok — 4 tính năng
-
-| # | Tính năng | Method | Input mode | GUI Widget | Priority |
-|---|---|---|---|---|---|
-| 1 | Batch download tác phẩm theo tài khoản | `account_acquisition_interactive_tiktok()` | URL / nhập tay / file .txt | `DownloadFrame` — tab "Account" (TikTok toggle) | P1 |
-| 2 | Download tác phẩm theo link | `detail_interactive_tiktok()` | Nhập link / file .txt | `DownloadFrame` — tab "Link" (TikTok toggle) | P1 |
-| 3 | Batch download hợp tuyển (Mix) | `mix_interactive_tiktok()` | URL / nhập tay / file .txt | `DownloadFrame` — tab "Mix" (TikTok toggle) | P1 |
-| 4 | Lấy địa chỉ livestream | `live_interactive_tiktok()` | Nhập link live | `DownloadFrame` — tab "Live" (TikTok toggle) | P2 |
-
-#### B3. Search Sub-modes (Douyin only)
-
-| # | Tính năng | Method | Priority |
-|---|---|---|---|
-| 1 | Tìm kiếm tổng hợp | `_search_interactive_general()` | P2 |
-| 2 | Tìm kiếm video | `_search_interactive_video()` | P2 |
-| 3 | Tìm kiếm user | `_search_interactive_user()` | P2 |
-| 4 | Tìm kiếm livestream | `_search_interactive_live()` | P3 |
-
-### C. Monitor Mode — `ClipboardMonitor` class
-
-| Tính năng | Mô tả | GUI Widget | Priority |
-|---|---|---|---|
-| Clipboard listener | Tự phát hiện link Douyin/TikTok trong clipboard và tải xuống | `MonitorFrame` — toggle ON/OFF | P1 |
-| Queue Douyin | Xử lý hàng đợi link Douyin riêng | Hiển thị queue count trên MonitorFrame | P2 |
-| Queue TikTok | Xử lý hàng đợi link TikTok riêng | Hiển thị queue count trên MonitorFrame | P2 |
-| Stop bằng clipboard "close" | Copy "close" vào clipboard để dừng | `MonitorFrame` — nút Stop | P1 |
-
-### D. Settings / Configuration — `Parameter` + `Settings` + `Database`
-
-| Tính năng | Source | GUI Widget | Priority |
-|---|---|---|---|
-| Thư mục lưu file | `settings.json` → `root` | `SettingsFrame` — folder picker | P1 |
-| Proxy HTTP/HTTPS | `settings.json` → `proxy` | `SettingsFrame` — text input | P2 |
-| Download threads / chunk size | `settings.json` → `chunk`, `max_retry` | `SettingsFrame` — number input | P2 |
-| Storage format (JSON/CSV/XLSX) | `settings.json` → `storage_format` | `SettingsFrame` — dropdown | P1 |
-| Name format template | `settings.json` → `name_format` | `SettingsFrame` — text input | P2 |
-| Folder mode (phân loại theo user) | `settings.json` → `folder_mode` | `SettingsFrame` — toggle | P2 |
-| Download type filter (video/image/music) | `settings.json` → `download_type` | `SettingsFrame` — checkboxes | P1 |
-| Cookie state indicator | `parameter.cookie_state` | Status bar — icon xanh/đỏ | P1 |
-| Cookie TikTok state indicator | `parameter.cookie_tiktok_state` | Status bar — icon xanh/đỏ | P1 |
-| Douyin platform toggle | `parameter.douyin_platform` | `SettingsFrame` — toggle | P1 |
-| TikTok platform toggle | `parameter.tiktok_platform` | `SettingsFrame` — toggle | P1 |
-| FFmpeg availability | `parameter.ffmpeg.state` | Status bar — icon | P2 |
-| Text replacement rules | `CLEANER.set_rule()` | `SettingsFrame` — text area (advanced) | P3 |
-| Periodic cookie refresh | `periodic_update_params()` | Background thread — tự động | P1 |
-
-### E. Tổng hợp GUI Frames mapping
-
-| Frame | Chứa tính năng | Tabs dự kiến |
-|---|---|---|
-| **DownloadFrame** | B1(1-11), B2(1-4), B3(1-4) | Account, Link, Mix, Live, Search, Collection, Data |
-| **SettingsFrame** | A(1-4,9,11-13), D(all) | Cookie, Directory, Download, Advanced |
-| **MonitorFrame** | A(6), C(all) | — (single view) |
-| **Status Bar** | Cookie state, FFmpeg, version, language | — (global, nằm trong app.py) |
+- [ ] Test có trong `test_gui_smoke.py`?
