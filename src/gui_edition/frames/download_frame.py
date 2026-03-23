@@ -69,7 +69,7 @@ class _DownloadTab(ctk.CTkFrame):
         self._tab_name = tab_name
         self._on_start = on_start
 
-        self.grid_columnconfigure(0, weight=1)
+        # Use pack for vertical stacking — guarantees button row is always visible
 
         # ── Label ─────────────────────────────────────────────────────
         ctk.CTkLabel(
@@ -78,12 +78,12 @@ class _DownloadTab(ctk.CTkFrame):
             font=Theme.FONT_H3,
             text_color=Theme.TEXT_PRIMARY,
             anchor="w",
-        ).grid(row=0, column=0, sticky="w", padx=Theme.PAD_MD, pady=(Theme.PAD_MD, Theme.PAD_SM))
+        ).pack(anchor="w", padx=Theme.PAD_MD, pady=(Theme.PAD_MD, Theme.PAD_SM))
 
         # ── URL text area ─────────────────────────────────────────────
         self._textbox = ctk.CTkTextbox(
             self,
-            height=120,
+            height=80,
             font=Theme.FONT_MONO,
             fg_color=Theme.BG_INPUT,
             text_color=Theme.TEXT_PRIMARY,
@@ -92,17 +92,17 @@ class _DownloadTab(ctk.CTkFrame):
             corner_radius=Theme.RADIUS_SM,
             wrap="word",
         )
-        self._textbox.grid(
-            row=1, column=0, sticky="ew",
+        self._textbox.pack(
+            fill="x", expand=True,
             padx=Theme.PAD_MD, pady=(0, Theme.PAD_SM),
         )
         if placeholder:
             self._textbox.insert("1.0", placeholder)
             self._textbox.bind("<FocusIn>", self._clear_placeholder)
 
-        # ── Button row ────────────────────────────────────────────────
+        # ── Button row (pinned at bottom) ─────────────────────────────
         btn_row = ctk.CTkFrame(self, fg_color="transparent")
-        btn_row.grid(row=2, column=0, sticky="ew", padx=Theme.PAD_MD, pady=(0, Theme.PAD_MD))
+        btn_row.pack(fill="x", padx=Theme.PAD_MD, pady=(0, Theme.PAD_MD))
         btn_row.grid_columnconfigure(1, weight=1)
 
         self._load_btn = ctk.CTkButton(
