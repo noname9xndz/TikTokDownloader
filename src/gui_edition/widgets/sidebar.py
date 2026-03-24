@@ -15,6 +15,7 @@ NAV_ITEMS = [
     ("download", "⬇  Download", "⬇"),
     ("settings", "⚙  Settings", "⚙"),
     ("monitor", "📋  Monitor", "📋"),
+    ("history", "📂  History", "📂"),
 ]
 
 

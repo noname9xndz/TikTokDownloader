@@ -13,7 +13,7 @@ import customtkinter as ctk
 from .async_handler import AsyncHandler
 from .backend_bootstrap import BackendBootstrap
 from .console_adapter import GUIConsole
-from .frames import DownloadFrame, MonitorFrame, SettingsFrame
+from .frames import DownloadFrame, HistoryFrame, MonitorFrame, SettingsFrame
 from .theme import Theme
 from .widgets import LogPanel, Sidebar, StatusBar, show_error
 
@@ -74,6 +74,7 @@ class App(ctk.CTk):
         self._frames["download"] = DownloadFrame(self._content_area, app_ref=self)
         self._frames["settings"] = SettingsFrame(self._content_area, app_ref=self)
         self._frames["monitor"] = MonitorFrame(self._content_area, app_ref=self)
+        self._frames["history"] = HistoryFrame(self._content_area, app_ref=self)
 
         for frame in self._frames.values():
             frame.grid(row=0, column=0, sticky="nsew")
