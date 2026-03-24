@@ -10,6 +10,8 @@ Tabs:
 
 from __future__ import annotations
 
+import re
+
 from pathlib import Path
 from tkinter import filedialog
 from typing import TYPE_CHECKING, Dict, Optional
@@ -47,6 +49,29 @@ _PLATFORMS = ["Douyin", "TikTok"]
 # Tabs that only work with Douyin
 _DOUYIN_ONLY_TABS = {"Collection", "Data", "Search"}
 
+# ── URL-platform detection ───────────────────────────────────────────────────
+
+_DOUYIN_PATTERNS = re.compile(
+    r"(?:douyin\.com|iesdouyin\.com|b\d+\.snssdk\.com)",
+    re.IGNORECASE,
+)
+_TIKTOK_PATTERNS = re.compile(
+    r"(?:tiktok\.com|vm\.tiktok\.com|vt\.tiktok\.com)",
+    re.IGNORECASE,
+)
+
+
+def _detect_platform(text: str) -> str | None:
+    """Return 'Douyin' or 'TikTok' if *text* contains a recognisable URL.
+
+    Returns ``None`` if no platform can be determined.
+    """
+    if _DOUYIN_PATTERNS.search(text):
+        return "Douyin"
+    if _TIKTOK_PATTERNS.search(text):
+        return "TikTok"
+    return None
+
 
 # ═══════════════════════════════════════════════════════════════════════════
 #  Reusable tab widget: URL text area + Load .txt + Start
@@ -63,11 +88,13 @@ class _DownloadTab(ctk.CTkFrame):
         placeholder: str = "",
         on_start=None,
         start_label: str = "▶  Start Download",
+        on_platform_mismatch=None,
         **kwargs,
     ):
         super().__init__(master, fg_color="transparent", **kwargs)
         self._tab_name = tab_name
         self._on_start = on_start
+        self._on_platform_mismatch = on_platform_mismatch
 
         # Use pack for vertical stacking — guarantees button row is always visible
 
@@ -99,6 +126,10 @@ class _DownloadTab(ctk.CTkFrame):
         if placeholder:
             self._textbox.insert("1.0", placeholder)
             self._textbox.bind("<FocusIn>", self._clear_placeholder)
+
+        # Listen for paste / content changes to auto-detect platform
+        self._textbox.bind("<<Paste>>", self._on_paste_event)
+        self._textbox.bind("<KeyRelease>", self._on_key_release)
 
         # ── Button row (pinned at bottom) ─────────────────────────────
         btn_row = ctk.CTkFrame(self, fg_color="transparent")
@@ -132,6 +163,7 @@ class _DownloadTab(ctk.CTkFrame):
         self._start_btn.grid(row=0, column=2, sticky="e")
 
         self._placeholder = placeholder
+        self._last_checked_text = ""
 
     # ── helpers ────────────────────────────────────────────────────────
 
@@ -139,6 +171,26 @@ class _DownloadTab(ctk.CTkFrame):
         current = self._textbox.get("1.0", "end").strip()
         if current == self._placeholder:
             self._textbox.delete("1.0", "end")
+
+    def _on_paste_event(self, _event=None):
+        """Schedule detection shortly after paste so the text is already inserted."""
+        self.after(50, self._check_pasted_url)
+
+    def _on_key_release(self, _event=None):
+        """Debounced check on typing (handles drag-drop / IME commit)."""
+        self.after(80, self._check_pasted_url)
+
+    def _check_pasted_url(self):
+        """Inspect the textbox content and notify if it belongs to another platform."""
+        if not self._on_platform_mismatch:
+            return
+        text = self._textbox.get("1.0", "end").strip()
+        if text == self._last_checked_text or text == self._placeholder:
+            return
+        self._last_checked_text = text
+        detected = _detect_platform(text)
+        if detected:
+            self._on_platform_mismatch(detected)
 
     def _load_txt(self):
         path = filedialog.askopenfilename(
@@ -690,6 +742,7 @@ class DownloadFrame(ctk.CTkFrame):
             tab_name="Account",
             placeholder="Paste account profile URLs here (one per line)…",
             on_start=self._on_start,
+            on_platform_mismatch=self._handle_platform_mismatch,
         )
         self._tab_account.pack(fill="both", expand=True)
 
@@ -698,6 +751,7 @@ class DownloadFrame(ctk.CTkFrame):
             tab_name="Link",
             placeholder="Paste video/post URLs here (one per line)…",
             on_start=self._on_start,
+            on_platform_mismatch=self._handle_platform_mismatch,
         )
         self._tab_link.pack(fill="both", expand=True)
 
@@ -706,6 +760,7 @@ class DownloadFrame(ctk.CTkFrame):
             tab_name="Mix",
             placeholder="Paste mix / playlist URLs here (one per line)…",
             on_start=self._on_start,
+            on_platform_mismatch=self._handle_platform_mismatch,
         )
         self._tab_mix.pack(fill="both", expand=True)
 
@@ -714,6 +769,7 @@ class DownloadFrame(ctk.CTkFrame):
             tab_name="Live",
             placeholder="Paste livestream URLs here (one per line)…",
             on_start=self._on_start,
+            on_platform_mismatch=self._handle_platform_mismatch,
             start_label="▶  Get Livestream",
         )
         self._tab_live.pack(fill="both", expand=True)
@@ -800,6 +856,36 @@ class DownloadFrame(ctk.CTkFrame):
                 overlay.place(relx=0, rely=0, relwidth=1, relheight=1)
             else:
                 overlay.place_forget()
+
+    # ── auto-detect platform mismatch ─────────────────────────────────
+
+    def _handle_platform_mismatch(self, detected_platform: str):
+        """Switch to *detected_platform* if it differs from the current one."""
+        if detected_platform == self._platform:
+            return  # already correct
+
+        old = self._platform
+        self._platform_seg.set(detected_platform)
+        self._on_platform_change(detected_platform)
+        self._log(
+            f"🔄 Auto-switched {old} → {detected_platform} (link detected)"
+        )
+        self._show_switch_toast(old, detected_platform)
+
+    def _show_switch_toast(self, old: str, new: str):
+        """Show a small temporary label indicating the auto-switch."""
+        toast = ctk.CTkLabel(
+            self,
+            text=f"  🔄  Detected {new} link — switched from {old}  ",
+            font=Theme.FONT_BODY,
+            text_color=Theme.BG_PRIMARY,
+            fg_color=Theme.ACCENT,
+            corner_radius=Theme.RADIUS_SM,
+            height=30,
+        )
+        toast.place(relx=0.5, y=8, anchor="n")
+        # Auto-hide after 3 seconds
+        self.after(3000, toast.destroy)
 
     # ── coroutine factory helper ──────────────────────────────────────
 
