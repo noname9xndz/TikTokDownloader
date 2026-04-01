@@ -176,12 +176,20 @@ class SettingsFrame(ctk.CTkFrame):
         )
         self._widgets["cookie_dy"].grid(row=0, column=1, padx=Theme.PAD_SM, pady=Theme.PAD_SM, sticky="ew")
 
-        btn_paste_dy = ctk.CTkButton(
-            fr, text="📋 Paste", width=80, font=Theme.FONT_SMALL,
+        btn_row_dy = ctk.CTkFrame(fr, fg_color="transparent")
+        btn_row_dy.grid(row=0, column=2, padx=(0, Theme.PAD_SM), pady=Theme.PAD_SM)
+
+        ctk.CTkButton(
+            btn_row_dy, text="📋 Paste", width=70, font=Theme.FONT_SMALL,
             fg_color=Theme.ACCENT, hover_color=Theme.ACCENT_HOVER,
             command=lambda: self._paste_clipboard("cookie_dy"),
-        )
-        btn_paste_dy.grid(row=0, column=2, padx=(0, Theme.PAD_SM), pady=Theme.PAD_SM)
+        ).pack(side="left", padx=(0, 4))
+
+        ctk.CTkButton(
+            btn_row_dy, text="📋 JSON", width=70, font=Theme.FONT_SMALL,
+            fg_color="#7C4DFF", hover_color="#651FFF",
+            command=lambda: self._paste_json_cookie("cookie_dy", "douyin"),
+        ).pack(side="left")
 
         # Browser import Douyin
         ctk.CTkLabel(fr, text="Import from browser", font=Theme.FONT_SMALL,
@@ -225,12 +233,20 @@ class SettingsFrame(ctk.CTkFrame):
         )
         self._widgets["cookie_tt"].grid(row=0, column=1, padx=Theme.PAD_SM, pady=Theme.PAD_SM, sticky="ew")
 
-        btn_paste_tt = ctk.CTkButton(
-            fr2, text="📋 Paste", width=80, font=Theme.FONT_SMALL,
+        btn_row_tt = ctk.CTkFrame(fr2, fg_color="transparent")
+        btn_row_tt.grid(row=0, column=2, padx=(0, Theme.PAD_SM), pady=Theme.PAD_SM)
+
+        ctk.CTkButton(
+            btn_row_tt, text="📋 Paste", width=70, font=Theme.FONT_SMALL,
             fg_color=Theme.ACCENT, hover_color=Theme.ACCENT_HOVER,
             command=lambda: self._paste_clipboard("cookie_tt"),
-        )
-        btn_paste_tt.grid(row=0, column=2, padx=(0, Theme.PAD_SM), pady=Theme.PAD_SM)
+        ).pack(side="left", padx=(0, 4))
+
+        ctk.CTkButton(
+            btn_row_tt, text="📋 JSON", width=70, font=Theme.FONT_SMALL,
+            fg_color="#7C4DFF", hover_color="#651FFF",
+            command=lambda: self._paste_json_cookie("cookie_tt", "tiktok"),
+        ).pack(side="left")
 
         # Browser import TikTok
         ctk.CTkLabel(fr2, text="Import from browser", font=Theme.FONT_SMALL,
@@ -840,10 +856,14 @@ class SettingsFrame(ctk.CTkFrame):
             widget = self._widgets.get(key)
             if widget:
                 data[key] = bool(widget.get())
-
-        # Cookies
-        data["cookie"] = self._widgets["cookie_dy"].get().strip()
-        data["cookie_tiktok"] = self._widgets["cookie_tt"].get().strip()
+        # Cookies — convert "key=val; key2=val2" string to dict for the backend
+        for entry_key, settings_key in [("cookie_dy", "cookie"), ("cookie_tt", "cookie_tiktok")]:
+            raw = self._widgets[entry_key].get().strip()
+            if raw:
+                from src.tools import cookie_str_to_dict
+                data[settings_key] = cookie_str_to_dict(raw)
+            else:
+                data[settings_key] = {}
 
         # Storage format
         sf_map = {"(none)": "", "CSV": "csv", "XLSX": "xlsx"}
@@ -868,19 +888,32 @@ class SettingsFrame(ctk.CTkFrame):
         self._log("✅ Settings saved to disk.")
 
         # Reload the backend Parameter so changes take effect immediately
-        if self._app and hasattr(self._app, "backend") and self._app.backend:
-            try:
-                import asyncio
-                loop = asyncio.get_event_loop()
-                if loop.is_running():
-                    loop.create_task(self._app.backend.reload_parameter())
-                else:
-                    loop.run_until_complete(self._app.backend.reload_parameter())
-                self._log("✅ Backend reloaded — settings are now active!")
-            except Exception as exc:
-                self._log(f"⚠ Settings saved but backend reload failed: {exc}")
+        if (self._app
+                and hasattr(self._app, "backend") and self._app.backend
+                and hasattr(self._app, "async_handler")):
+            self._app.async_handler.run_async(
+                self._app.backend.reload_parameter(),
+                on_done=lambda _: self._on_backend_reloaded(),
+                on_error=lambda exc: self._log(
+                    f"⚠ Settings saved but backend reload failed: {exc}"
+                ),
+            )
         else:
             self._log("⚠ Settings saved to disk (restart to apply).")
+
+    def _on_backend_reloaded(self) -> None:
+        """Called after backend.reload_parameter() completes — refresh UI."""
+        self._log("✅ Backend reloaded — settings are now active!")
+        # Update status bar cookie indicators
+        if self._app and hasattr(self._app, "status_bar") and hasattr(self._app, "backend"):
+            p = self._app.backend.parameter
+            if p:
+                self._app.status_bar.set_cookie_status(
+                    "Douyin", bool(p.cookie_state),
+                )
+                self._app.status_bar.set_cookie_status(
+                    "TikTok", bool(p.cookie_tiktok_state),
+                )
 
     def _reset_defaults(self) -> None:
         """Reset all fields to the defaults from config/settings.py."""
@@ -935,6 +968,59 @@ class SettingsFrame(ctk.CTkFrame):
             self._log(f"✅ Imported {len(cookies)} cookies from {browser_name} ({platform}).")
         except Exception as exc:
             self._log(f"❌ Failed to import cookies: {exc}")
+
+    def _paste_json_cookie(self, widget_key: str, platform: str) -> None:
+        """Parse Cookie-Editor JSON from clipboard and set as cookie string.
+
+        Cookie-Editor exports an array of objects like:
+            [{"name": "key", "value": "val", "domain": ".tiktok.com", ...}, ...]
+        We convert this to the standard ``key1=value1; key2=value2`` format.
+        """
+        try:
+            text = self.clipboard_get()
+        except Exception:
+            self._log("⚠ Clipboard is empty or inaccessible.")
+            return
+
+        if not text or not text.strip():
+            self._log("⚠ Clipboard is empty.")
+            return
+
+        try:
+            data = json.loads(text)
+        except json.JSONDecodeError:
+            self._log("⚠ Clipboard does not contain valid JSON. "
+                      "Copy the full JSON array from Cookie-Editor.")
+            return
+
+        if not isinstance(data, list):
+            self._log("⚠ Expected a JSON array [...] from Cookie-Editor.")
+            return
+
+        # Deduplicate: keep the last occurrence of each cookie name
+        seen: dict[str, str] = {}
+        for item in data:
+            if not isinstance(item, dict):
+                continue
+            name = item.get("name", "").strip()
+            value = item.get("value", "").strip()
+            if name:
+                seen[name] = value
+
+        if not seen:
+            self._log("⚠ No valid cookies found in the JSON array.")
+            return
+
+        cookie_str = "; ".join(f"{k}={v}" for k, v in seen.items())
+
+        widget = self._widgets.get(widget_key)
+        if widget:
+            widget.delete(0, "end")
+            widget.insert(0, cookie_str)
+
+        self._log(
+            f"✅ Imported {len(seen)} cookies from Cookie-Editor JSON ({platform})."
+        )
 
     def _pick_directory(self) -> None:
         """Open native folder picker dialog."""

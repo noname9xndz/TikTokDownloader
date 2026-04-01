@@ -25,14 +25,25 @@ class StatusBar(ctk.CTkFrame):
         self.grid_propagate(False)
         self.grid_columnconfigure(1, weight=1)
 
-        # ── Cookie indicator ──────────────────────────────────────────
-        self._cookie_label = ctk.CTkLabel(
-            self,
-            text="● Cookie: N/A",
+        # ── Cookie indicators (Douyin + TikTok) ────────────────────────
+        cookie_frame = ctk.CTkFrame(self, fg_color="transparent", height=20)
+        cookie_frame.grid(row=0, column=0, padx=Theme.PAD_MD, sticky="w")
+
+        self._cookie_dy_label = ctk.CTkLabel(
+            cookie_frame,
+            text="● Douyin cookie: N/A",
             font=Theme.FONT_SMALL,
             text_color=Theme.TEXT_MUTED,
         )
-        self._cookie_label.grid(row=0, column=0, padx=Theme.PAD_MD, sticky="w")
+        self._cookie_dy_label.pack(side="left", padx=(0, Theme.PAD_SM))
+
+        self._cookie_tt_label = ctk.CTkLabel(
+            cookie_frame,
+            text="● TikTok cookie: N/A",
+            font=Theme.FONT_SMALL,
+            text_color=Theme.TEXT_MUTED,
+        )
+        self._cookie_tt_label.pack(side="left")
 
         # ── Centre message ────────────────────────────────────────────
         self._message_label = ctk.CTkLabel(
@@ -56,13 +67,14 @@ class StatusBar(ctk.CTkFrame):
 
     def set_cookie_status(self, platform: str, ok: bool) -> None:
         """Update cookie indicator. ``platform``: 'Douyin' or 'TikTok'."""
+        lbl = self._cookie_dy_label if platform == "Douyin" else self._cookie_tt_label
         if ok:
-            self._cookie_label.configure(
+            lbl.configure(
                 text=f"● {platform} cookie ✓",
                 text_color=Theme.SUCCESS,
             )
         else:
-            self._cookie_label.configure(
+            lbl.configure(
                 text=f"● {platform} cookie ✕",
                 text_color=Theme.ERROR,
             )
