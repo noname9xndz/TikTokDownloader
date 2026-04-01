@@ -7,12 +7,18 @@ minimal modification — just inject a ``GUIConsole`` instead of
 
 All output is forwarded to a ``customtkinter.CTkTextbox`` on the GUI thread.
 ``input()`` opens a blocking dialog.
+
+Phase 9: added optional file logging with rotation (gui.log, 5 MB max).
 """
 
 from __future__ import annotations
 
+import logging
+import os
 import tkinter as tk
 from datetime import datetime
+from logging.handlers import RotatingFileHandler
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
 
 import customtkinter as ctk
@@ -34,6 +40,43 @@ _STYLE_COLOURS = {
     "progress": "#FF00FF",
 }
 
+# Map our style tags to Python logging levels
+_LEVEL_MAP = {
+    "general": logging.INFO,
+    "info": logging.INFO,
+    "warning": logging.WARNING,
+    "error": logging.ERROR,
+    "debug": logging.DEBUG,
+    "master": logging.INFO,
+    "prompt": logging.INFO,
+    "progress": logging.INFO,
+}
+
+
+def _setup_file_logger(debug: bool = False) -> logging.Logger:
+    """Create a rotating file logger writing to ~/.DouK-Downloader/gui.log."""
+    log_dir = Path.home() / ".DouK-Downloader"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_path = log_dir / "gui.log"
+
+    logger = logging.getLogger("douk.gui")
+    if logger.handlers:
+        # Already set up (e.g. multiple GUIConsole instances)
+        return logger
+
+    logger.setLevel(logging.DEBUG if debug else logging.INFO)
+    handler = RotatingFileHandler(
+        log_path,
+        maxBytes=5 * 1024 * 1024,  # 5 MB
+        backupCount=3,
+        encoding="utf-8",
+    )
+    handler.setFormatter(
+        logging.Formatter("%(asctime)s [%(levelname)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+    )
+    logger.addHandler(handler)
+    return logger
+
 
 class GUIConsole:
     """Drop-in replacement for ``ColorfulConsole`` that writes to a CTkTextbox."""
@@ -41,6 +84,7 @@ class GUIConsole:
     def __init__(self, textbox: Optional[ctk.CTkTextbox] = None, debug: bool = False):
         self.debug_mode = debug
         self._textbox: Optional[ctk.CTkTextbox] = textbox
+        self._file_logger = _setup_file_logger(debug)
 
     def bind_textbox(self, textbox: ctk.CTkTextbox) -> None:
         """Attach (or re-attach) the output widget."""
@@ -53,7 +97,9 @@ class GUIConsole:
 
     def print(self, *args, style="general", highlight=False, **kwargs) -> None:
         text = " ".join(str(a) for a in args)
-        self._append(text, self._resolve_tag(style))
+        tag = self._resolve_tag(style)
+        self._append(text, tag)
+        self._log_to_file(text, tag)
 
     def info(self, *args, highlight=False, **kwargs) -> None:
         self.print(*args, style="info", highlight=highlight, **kwargs)
@@ -100,3 +146,8 @@ class GUIConsole:
         self._textbox._textbox.insert(tk.END, line, tag)  # noqa: access internal
         self._textbox.configure(state="disabled")
         self._textbox._textbox.see(tk.END)  # noqa: auto-scroll
+
+    def _log_to_file(self, text: str, tag: str) -> None:
+        """Also write the log line to the rotating file logger."""
+        level = _LEVEL_MAP.get(tag, logging.INFO)
+        self._file_logger.log(level, text)

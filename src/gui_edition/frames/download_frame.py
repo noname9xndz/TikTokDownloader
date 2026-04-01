@@ -803,19 +803,65 @@ class DownloadFrame(ctk.CTkFrame):
             self._overlays[tab_name] = overlay
             # Initially hidden (Douyin is selected)
 
-        # ── Queue area (scrollable) ──────────────────────────────────
-        queue_label = ctk.CTkLabel(
-            self,
+        # ── Queue header bar: label + summary counters + action buttons ─
+        queue_header = ctk.CTkFrame(self, fg_color="transparent")
+        queue_header.grid(
+            row=2, column=0, sticky="ew",
+            padx=Theme.PAD_LG, pady=(Theme.PAD_SM, 0),
+        )
+        queue_header.grid_columnconfigure(1, weight=1)
+
+        ctk.CTkLabel(
+            queue_header,
             text="Download Queue",
             font=Theme.FONT_H3,
             text_color=Theme.TEXT_SECONDARY,
             anchor="w",
-        )
-        queue_label.grid(
-            row=2, column=0, sticky="w",
-            padx=Theme.PAD_LG, pady=(Theme.PAD_SM, 0),
-        )
+        ).grid(row=0, column=0, sticky="w")
 
+        # Summary counters (e.g. "Active 1 · Queued 3 · Done 2 · Failed 0")
+        self._summary_label = ctk.CTkLabel(
+            queue_header,
+            text="",
+            font=Theme.FONT_SMALL,
+            text_color=Theme.TEXT_MUTED,
+            anchor="e",
+        )
+        self._summary_label.grid(row=0, column=1, sticky="e", padx=(Theme.PAD_MD, 0))
+
+        # Action buttons row
+        btn_frame = ctk.CTkFrame(queue_header, fg_color="transparent")
+        btn_frame.grid(row=0, column=2, sticky="e", padx=(Theme.PAD_SM, 0))
+
+        self._pause_btn = ctk.CTkButton(
+            btn_frame,
+            text="⏸ Pause All",
+            width=90,
+            height=26,
+            font=Theme.FONT_SMALL,
+            fg_color=Theme.BG_CARD,
+            hover_color=Theme.BG_HOVER,
+            text_color=Theme.TEXT_SECONDARY,
+            corner_radius=Theme.RADIUS_SM,
+            command=self._toggle_pause,
+        )
+        self._pause_btn.pack(side="left", padx=(0, Theme.PAD_XS))
+
+        self._clear_done_btn = ctk.CTkButton(
+            btn_frame,
+            text="🗑 Clear Done",
+            width=90,
+            height=26,
+            font=Theme.FONT_SMALL,
+            fg_color=Theme.BG_CARD,
+            hover_color=Theme.BG_HOVER,
+            text_color=Theme.TEXT_SECONDARY,
+            corner_radius=Theme.RADIUS_SM,
+            command=self._clear_done,
+        )
+        self._clear_done_btn.pack(side="left")
+
+        # ── Queue area (scrollable) ──────────────────────────────────
         self._queue_scroll = ctk.CTkScrollableFrame(
             self,
             fg_color=Theme.BG_SECONDARY,
@@ -844,6 +890,10 @@ class DownloadFrame(ctk.CTkFrame):
             self._manager = DownloadManager(ah, on_card_update=self._update_card)
         else:
             self._manager: Optional[DownloadManager] = None
+
+        # ── Elapsed-time polling loop ────────────────────────────────
+        self._tick_id: Optional[str] = None
+        self._start_tick()
 
     # ── platform toggle ──────────────────────────────────────────────
 
@@ -1007,7 +1057,12 @@ class DownloadFrame(ctk.CTkFrame):
             # Remove empty-queue placeholder on first task
             self._empty_label.grid_forget()
 
-            card = ProgressCard(self._queue_scroll, filename=info.label)
+            card = ProgressCard(
+                self._queue_scroll,
+                filename=info.label,
+                on_cancel=lambda tid=info.task_id: self._cancel_task(tid),
+                on_retry=lambda tid=info.task_id: self._retry_task(tid),
+            )
             card.grid(
                 row=len(self._cards),
                 column=0,
@@ -1019,15 +1074,103 @@ class DownloadFrame(ctk.CTkFrame):
         # Update card state from TaskInfo
         match info.status:
             case TaskStatus.QUEUED:
-                card.set_status("Waiting…")
+                card.set_queue_position(info.queue_position)
+                card.set_retry_info(info.attempt, info.max_retries)
             case TaskStatus.RUNNING:
                 card.set_status("Downloading…", Theme.ACCENT)
+                card.set_elapsed(int(info.elapsed))
+                card.set_retry_info(info.attempt, info.max_retries)
+            case TaskStatus.RETRYING:
+                card.set_status("Retrying…", Theme.WARNING)
+                card.set_retry_info(info.attempt, info.max_retries)
             case TaskStatus.DONE:
+                card.set_elapsed(int(info.elapsed))
                 card.mark_done()
             case TaskStatus.ERROR:
+                card.set_elapsed(int(info.elapsed))
                 card.mark_error(info.error_msg or "Error")
+                card.show_retry_button()
             case TaskStatus.CANCELLED:
+                card.set_elapsed(int(info.elapsed))
                 card.set_status("Cancelled", Theme.WARNING)
+
+        # Update summary bar
+        self._refresh_summary()
+
+    def _cancel_task(self, task_id: str):
+        if self._manager:
+            self._manager.cancel(task_id)
+
+    def _retry_task(self, task_id: str):
+        if self._manager:
+            self._manager.retry(task_id)
+
+    # ── queue action buttons ─────────────────────────────────────────
+
+    def _toggle_pause(self):
+        if self._manager is None:
+            return
+        if self._manager.paused:
+            self._manager.resume()
+            self._pause_btn.configure(text="⏸ Pause All")
+            self._log("▶ Queue resumed")
+        else:
+            self._manager.pause()
+            self._pause_btn.configure(text="▶ Resume")
+            self._log("⏸ Queue paused")
+
+    def _clear_done(self):
+        if self._manager is None:
+            return
+        removed = self._manager.clear_done()
+        for tid in removed:
+            card = self._cards.pop(tid, None)
+            if card:
+                card.destroy()
+        if removed:
+            self._log(f"🗑 Cleared {len(removed)} completed task(s)")
+        # Re-show empty placeholder if queue is empty
+        if not self._cards:
+            self._empty_label.grid(row=0, column=0, pady=Theme.PAD_XL)
+        self._refresh_summary()
+
+    # ── summary bar ──────────────────────────────────────────────────
+
+    def _refresh_summary(self):
+        if self._manager is None:
+            self._summary_label.configure(text="")
+            return
+        c = self._manager.counts
+        parts = []
+        if c["active"]:   parts.append(f"Active {c['active']}")
+        if c["queued"]:   parts.append(f"Queued {c['queued']}")
+        if c["done"]:     parts.append(f"Done {c['done']}")
+        if c["failed"]:   parts.append(f"Failed {c['failed']}")
+        self._summary_label.configure(text="  ·  ".join(parts) if parts else "")
+
+    # ── elapsed-time ticker (1 s) ─────────────────────────────────────
+
+    def _start_tick(self):
+        """Begin the 1-second polling loop that updates elapsed times."""
+        self._tick()
+
+    def _tick(self):
+        """Called every second to update elapsed time on running cards."""
+        if self._manager:
+            for tid, info in self._manager.tasks.items():
+                if info.status in (TaskStatus.RUNNING, TaskStatus.RETRYING):
+                    card = self._cards.get(tid)
+                    if card:
+                        card.set_elapsed(int(info.elapsed))
+        # Schedule next tick
+        self._tick_id = self.after(1000, self._tick)
+
+    def destroy(self):
+        """Cancel the tick loop on frame destruction."""
+        if self._tick_id is not None:
+            self.after_cancel(self._tick_id)
+            self._tick_id = None
+        super().destroy()
 
     # ── logging shortcut ─────────────────────────────────────────────
 
