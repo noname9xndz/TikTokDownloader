@@ -65,7 +65,7 @@ class Account(API):
                     data_key,
                     error_text
                     or _(
-                        "该账号为私密账号，需要使用登录后的 Cookie，且登录的账号需要关注该私密账号"
+                        "This is a private account. A logged-in Cookie is required, and the logged-in account must follow this private account"
                     ),
                     cursor,
                     has_more,
@@ -82,7 +82,7 @@ class Account(API):
                     data_key,
                     error_text
                     or _(
-                        "该账号为私密账号，需要使用登录后的 Cookie，且登录的账号需要关注该私密账号"
+                        "This is a private account. A logged-in Cookie is required, and the logged-in account must follow this private account"
                     ),
                     cursor,
                     has_more,
@@ -152,7 +152,7 @@ class Account(API):
         self.summary_works()
 
     async def early_stop(self):
-        """如果获取数据的发布日期已经早于限制日期，就不需要再获取下一页的数据了"""
+        """Stop fetching if the publish date is earlier than the limit date"""
         if (
             not self.favorite
             and self.earliest
@@ -237,7 +237,7 @@ class Account(API):
         self.log.info(
             _("作品{tip}发布日期: {latest_date}").format(tip=tip, latest_date=date_)
         )
-        return date_  # 返回 date 对象
+        return date_  # return date object
 
     def check_response(
         self,

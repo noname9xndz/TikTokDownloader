@@ -109,14 +109,14 @@ class XGnarly:
 
     def __init__(self):
         """
-        初始化 XGnarly 实例，并创建其唯一的 PRNG 状态。
+        Initialize XGnarly instance and create its unique PRNG state.
         """
         self.St = None
         self._init_prng_state()
 
     def _init_prng_state(self):
         """
-        设置 PRNG 的初始状态，此状态将在此实例的生命周期内持续存在。
+        Set the initial PRNG state, which will persist for the lifetime of this instance.
         """
         now_ms = int(time() * 1000)
         self.kt = [

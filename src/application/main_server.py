@@ -115,9 +115,9 @@ class APIServer(TikTok):
             summary=_("测试令牌有效性"),
             description=_(
                 dedent("""
-                项目默认无需令牌；公开部署时，建议设置令牌以防止恶意请求！
+                No token required by default; for public deployments, set a token to prevent malicious requests!
                 
-                令牌设置位置：`src/custom/function.py` - `is_valid_token()`
+                Token setting location: `src/custom/function.py` - `is_valid_token()`
                 """)
             ),
             tags=[_("项目")],
@@ -135,11 +135,11 @@ class APIServer(TikTok):
             summary=_("更新项目全局配置"),
             description=_(
                 dedent("""
-                更新项目配置文件 settings.json
+                Update project configuration file settings.json
                 
-                仅需传入需要更新的配置参数
+                Only pass the parameters that need to be updated
                 
-                返回更新后的全部配置参数
+                Returns all updated configuration parameters
                 """)
             ),
             tags=[_("配置")],
@@ -166,10 +166,10 @@ class APIServer(TikTok):
             summary=_("获取分享链接重定向的完整链接"),
             description=_(
                 dedent("""
-                **参数**:
+                **Parameters**:
                 
-                - **text**: 包含分享链接的字符串；必需参数
-                - **proxy**: 代理；可选参数
+                - **text**: String containing share link; required
+                - **proxy**: Proxy; optional
                 """)
             ),
             tags=[_("抖音")],
@@ -195,12 +195,12 @@ class APIServer(TikTok):
             summary=_("获取单个作品数据"),
             description=_(
                 dedent("""
-                **参数**:
+                **Parameters**:
                 
-                - **cookie**: 抖音 Cookie；可选参数
-                - **proxy**: 代理；可选参数
-                - **source**: 是否返回原始响应数据；可选参数，默认值：False
-                - **detail_id**: 抖音作品 ID；必需参数
+                - **cookie**: DouYin Cookie; optional
+                - **proxy**: Proxy; optional
+                - **source**: Return raw response data; optional, default: False
+                - **detail_id**: DouYin post ID; required
                 """)
             ),
             tags=[_("抖音")],
@@ -216,18 +216,18 @@ class APIServer(TikTok):
             summary=_("获取账号作品数据"),
             description=_(
                 dedent("""
-                **参数**:
+                **Parameters**:
                 
-                - **cookie**: 抖音 Cookie；可选参数
-                - **proxy**: 代理；可选参数
-                - **source**: 是否返回原始响应数据；可选参数，默认值：False
-                - **sec_user_id**: 抖音账号 sec_uid；必需参数
-                - **tab**: 账号页面类型；可选参数，默认值：`post`
-                - **earliest**: 作品最早发布日期；可选参数
-                - **latest**: 作品最晚发布日期；可选参数
-                - **pages**: 最大请求次数，仅对请求账号喜欢页数据有效；可选参数
-                - **cursor**: 可选参数
-                - **count**: 可选参数
+                - **cookie**: DouYin Cookie; optional
+                - **proxy**: Proxy; optional
+                - **source**: Return raw response data; optional, default: False
+                - **sec_user_id**: DouYin account sec_uid; required
+                - **tab**: Account page type; optional, default: `post`
+                - **earliest**: Earliest post publish date; optional
+                - **latest**: Latest post publish date; optional
+                - **pages**: Max requests, only valid for account liked page; optional
+                - **cursor**: optional
+                - **count**: optional
                 """)
             ),
             tags=[_("抖音")],
@@ -243,17 +243,17 @@ class APIServer(TikTok):
             summary=_("获取合集作品数据"),
             description=_(
                 dedent("""
-                **参数**:
+                **Parameters**:
                 
-                - **cookie**: 抖音 Cookie；可选参数
-                - **proxy**: 代理；可选参数
-                - **source**: 是否返回原始响应数据；可选参数，默认值：False
-                - **mix_id**: 抖音合集 ID
-                - **detail_id**: 属于合集的抖音作品 ID
-                - **cursor**: 可选参数
-                - **count**: 可选参数
+                - **cookie**: DouYin Cookie; optional
+                - **proxy**: Proxy; optional
+                - **source**: Return raw response data; optional, default: False
+                - **mix_id**: DouYin mix (collection) ID
+                - **detail_id**: DouYin post ID belonging to the mix
+                - **cursor**: optional
+                - **count**: optional
                 
-                **`mix_id` 和 `detail_id` 二选一，只需传入其中之一即可**
+                **Provide either `mix_id` or `detail_id`, only one is needed**
                 """)
             ),
             tags=[_("抖音")],
@@ -288,12 +288,12 @@ class APIServer(TikTok):
             summary=_("获取直播数据"),
             description=_(
                 dedent("""
-                **参数**:
+                **Parameters**:
                 
-                - **cookie**: 抖音 Cookie；可选参数
-                - **proxy**: 代理；可选参数
-                - **source**: 是否返回原始响应数据；可选参数，默认值：False
-                - **web_rid**: 抖音直播 web_rid
+                - **cookie**: DouYin Cookie; optional
+                - **proxy**: Proxy; optional
+                - **source**: Return raw response data; optional, default: False
+                - **web_rid**: DouYin live stream web_rid
                 """)
             ),
             tags=[_("抖音")],
@@ -326,17 +326,17 @@ class APIServer(TikTok):
             summary=_("获取作品评论数据"),
             description=_(
                 dedent("""
-                **参数**:
+                **Parameters**:
                 
-                - **cookie**: 抖音 Cookie；可选参数
-                - **proxy**: 代理；可选参数
-                - **source**: 是否返回原始响应数据；可选参数，默认值：False
-                - **detail_id**: 抖音作品 ID；必需参数
-                - **pages**: 最大请求次数；可选参数
-                - **cursor**: 可选参数
-                - **count**: 可选参数
-                - **count_reply**: 可选参数
-                - **reply**: 可选参数，默认值：False
+                - **cookie**: DouYin Cookie; optional
+                - **proxy**: Proxy; optional
+                - **source**: Return raw response data; optional, default: False
+                - **detail_id**: DouYin post ID; required
+                - **pages**: Max request count; optional
+                - **cursor**: optional
+                - **count**: optional
+                - **count_reply**: optional
+                - **reply**: optional, default: False
                 """)
             ),
             tags=[_("抖音")],
@@ -364,16 +364,16 @@ class APIServer(TikTok):
             summary=_("获取评论回复数据"),
             description=_(
                 dedent("""
-                **参数**:
+                **Parameters**:
                 
-                - **cookie**: 抖音 Cookie；可选参数
-                - **proxy**: 代理；可选参数
-                - **source**: 是否返回原始响应数据；可选参数，默认值：False
-                - **detail_id**: 抖音作品 ID；必需参数
-                - **comment_id**: 评论 ID；必需参数
-                - **pages**: 最大请求次数；可选参数
-                - **cursor**: 可选参数
-                - **count**: 可选参数
+                - **cookie**: DouYin Cookie; optional
+                - **proxy**: Proxy; optional
+                - **source**: Return raw response data; optional, default: False
+                - **detail_id**: DouYin post ID; required
+                - **comment_id**: Comment ID; required
+                - **pages**: Max request count; optional
+                - **cursor**: optional
+                - **count**: optional
                 """)
             ),
             tags=[_("抖音")],
@@ -398,22 +398,22 @@ class APIServer(TikTok):
             summary=_("获取综合搜索数据"),
             description=_(
                 dedent("""
-                **参数**:
+                **Parameters**:
                 
-                - **cookie**: 抖音 Cookie；可选参数
-                - **proxy**: 代理；可选参数
-                - **source**: 是否返回原始响应数据；可选参数，默认值：False
-                - **keyword**: 关键词；必需参数
-                - **offset**: 起始页码；可选参数
-                - **count**: 数据数量；可选参数
-                - **pages**: 总页数；可选参数
-                - **sort_type**: 排序依据；可选参数
-                - **publish_time**: 发布时间；可选参数
-                - **duration**: 视频时长；可选参数
-                - **search_range**: 搜索范围；可选参数
-                - **content_type**: 内容形式；可选参数
+                - **cookie**: DouYin Cookie; optional
+                - **proxy**: Proxy; optional
+                - **source**: Return raw response data; optional, default: False
+                - **keyword**: Keyword; required
+                - **offset**: Starting page; optional
+                - **count**: Data count; optional
+                - **pages**: Total pages; optional
+                - **sort_type**: Sort by; optional
+                - **publish_time**: Publish time; optional
+                - **duration**: Video duration; optional
+                - **search_range**: Search range; optional
+                - **content_type**: Content type; optional
                 
-                **部分参数传入规则请查阅文档**: [参数含义](https://github.com/JoeanAmier/TikTokDownloader/wiki/Documentation#%E9%87%87%E9%9B%86%E6%90%9C%E7%B4%A2%E7%BB%93%E6%9E%9C%E6%95%B0%E6%8D%AE%E6%8A%96%E9%9F%B3)
+                **For parameter rules, please refer to the documentation**: [Parameter Reference](https://github.com/JoeanAmier/TikTokDownloader/wiki/Documentation#%E9%87%87%E9%9B%86%E6%90%9C%E7%B4%A2%E7%BB%93%E6%9E%9C%E6%95%B0%E6%8D%AE%E6%8A%96%E9%9F%B3)
                 """)
             ),
             tags=[_("抖音")],
@@ -429,21 +429,21 @@ class APIServer(TikTok):
             summary=_("获取视频搜索数据"),
             description=_(
                 dedent("""
-                **参数**:
+                **Parameters**:
                 
-                - **cookie**: 抖音 Cookie；可选参数
-                - **proxy**: 代理；可选参数
-                - **source**: 是否返回原始响应数据；可选参数，默认值：False
-                - **keyword**: 关键词；必需参数
-                - **offset**: 起始页码；可选参数
-                - **count**: 数据数量；可选参数
-                - **pages**: 总页数；可选参数
-                - **sort_type**: 排序依据；可选参数
-                - **publish_time**: 发布时间；可选参数
-                - **duration**: 视频时长；可选参数
-                - **search_range**: 搜索范围；可选参数
+                - **cookie**: DouYin Cookie; optional
+                - **proxy**: Proxy; optional
+                - **source**: Return raw response data; optional, default: False
+                - **keyword**: Keyword; required
+                - **offset**: Starting page; optional
+                - **count**: Data count; optional
+                - **pages**: Total pages; optional
+                - **sort_type**: Sort by; optional
+                - **publish_time**: Publish time; optional
+                - **duration**: Video duration; optional
+                - **search_range**: Search range; optional
                 
-                **部分参数传入规则请查阅文档**: [参数含义](https://github.com/JoeanAmier/TikTokDownloader/wiki/Documentation#%E9%87%87%E9%9B%86%E6%90%9C%E7%B4%A2%E7%BB%93%E6%9E%9C%E6%95%B0%E6%8D%AE%E6%8A%96%E9%9F%B3)
+                **For parameter rules, please refer to the documentation**: [Parameter Reference](https://github.com/JoeanAmier/TikTokDownloader/wiki/Documentation#%E9%87%87%E9%9B%86%E6%90%9C%E7%B4%A2%E7%BB%93%E6%9E%9C%E6%95%B0%E6%8D%AE%E6%8A%96%E9%9F%B3)
                 """)
             ),
             tags=[_("抖音")],
@@ -459,19 +459,19 @@ class APIServer(TikTok):
             summary=_("获取用户搜索数据"),
             description=_(
                 dedent("""
-                **参数**:
+                **Parameters**:
                 
-                - **cookie**: 抖音 Cookie；可选参数
-                - **proxy**: 代理；可选参数
-                - **source**: 是否返回原始响应数据；可选参数，默认值：False
-                - **keyword**: 关键词；必需参数
-                - **offset**: 起始页码；可选参数
-                - **count**: 数据数量；可选参数
-                - **pages**: 总页数；可选参数
-                - **douyin_user_fans**: 粉丝数量；可选参数
-                - **douyin_user_type**: 用户类型；可选参数
+                - **cookie**: DouYin Cookie; optional
+                - **proxy**: Proxy; optional
+                - **source**: Return raw response data; optional, default: False
+                - **keyword**: Keyword; required
+                - **offset**: Starting page; optional
+                - **count**: Data count; optional
+                - **pages**: Total pages; optional
+                - **douyin_user_fans**: Followers count; optional
+                - **douyin_user_type**: User type; optional
                 
-                **部分参数传入规则请查阅文档**: [参数含义](https://github.com/JoeanAmier/TikTokDownloader/wiki/Documentation#%E9%87%87%E9%9B%86%E6%90%9C%E7%B4%A2%E7%BB%93%E6%9E%9C%E6%95%B0%E6%8D%AE%E6%8A%96%E9%9F%B3)
+                **For parameter rules, please refer to the documentation**: [Parameter Reference](https://github.com/JoeanAmier/TikTokDownloader/wiki/Documentation#%E9%87%87%E9%9B%86%E6%90%9C%E7%B4%A2%E7%BB%93%E6%9E%9C%E6%95%B0%E6%8D%AE%E6%8A%96%E9%9F%B3)
                 """)
             ),
             tags=[_("抖音")],
@@ -487,15 +487,15 @@ class APIServer(TikTok):
             summary=_("获取直播搜索数据"),
             description=_(
                 dedent("""
-                **参数**:
+                **Parameters**:
                 
-                - **cookie**: 抖音 Cookie；可选参数
-                - **proxy**: 代理；可选参数
-                - **source**: 是否返回原始响应数据；可选参数，默认值：False
-                - **keyword**: 关键词；必需参数
-                - **offset**: 起始页码；可选参数
-                - **count**: 数据数量；可选参数
-                - **pages**: 总页数；可选参数
+                - **cookie**: DouYin Cookie; optional
+                - **proxy**: Proxy; optional
+                - **source**: Return raw response data; optional, default: False
+                - **keyword**: Keyword; required
+                - **offset**: Starting page; optional
+                - **count**: Data count; optional
+                - **pages**: Total pages; optional
                 """)
             ),
             tags=[_("抖音")],
@@ -511,10 +511,10 @@ class APIServer(TikTok):
             summary=_("获取分享链接重定向的完整链接"),
             description=_(
                 dedent("""
-            **参数**:
+            **Parameters**:
 
-            - **text**: 包含分享链接的字符串；必需参数
-            - **proxy**: 代理；可选参数
+            - **text**: String containing share link; required
+            - **proxy**: Proxy; optional
             """)
             ),
             tags=["TikTok"],
@@ -540,12 +540,12 @@ class APIServer(TikTok):
             summary=_("获取单个作品数据"),
             description=_(
                 dedent("""
-                **参数**:
+                **Parameters**:
 
-                - **cookie**: TikTok Cookie；可选参数
-                - **proxy**: 代理；可选参数
-                - **source**: 是否返回原始响应数据；可选参数，默认值：False
-                - **detail_id**: TikTok 作品 ID；必需参数
+                - **cookie**: TikTok Cookie; optional
+                - **proxy**: Proxy; optional
+                - **source**: Return raw response data; optional, default: False
+                - **detail_id**: TikTok post ID; required
                 """)
             ),
             tags=["TikTok"],
@@ -561,18 +561,18 @@ class APIServer(TikTok):
             summary=_("获取账号作品数据"),
             description=_(
                 dedent("""
-                **参数**:
+                **Parameters**:
 
-                - **cookie**: TikTok Cookie；可选参数
-                - **proxy**: 代理；可选参数
-                - **source**: 是否返回原始响应数据；可选参数，默认值：False
-                - **sec_user_id**: TikTok 账号 secUid；必需参数
-                - **tab**: 账号页面类型；可选参数，默认值：`post`
-                - **earliest**: 作品最早发布日期；可选参数
-                - **latest**: 作品最晚发布日期；可选参数
-                - **pages**: 最大请求次数，仅对请求账号喜欢页数据有效；可选参数
-                - **cursor**: 可选参数
-                - **count**: 可选参数
+                - **cookie**: TikTok Cookie; optional
+                - **proxy**: Proxy; optional
+                - **source**: Return raw response data; optional, default: False
+                - **sec_user_id**: TikTok account secUid; required
+                - **tab**: Account page type; optional, default: `post`
+                - **earliest**: Earliest post publish date; optional
+                - **latest**: Latest post publish date; optional
+                - **pages**: Max requests, only valid for account liked page; optional
+                - **cursor**: optional
+                - **count**: optional
                 """)
             ),
             tags=["TikTok"],
@@ -588,14 +588,14 @@ class APIServer(TikTok):
             summary=_("获取合辑作品数据"),
             description=_(
                 dedent("""
-                **参数**:
+                **Parameters**:
 
-                - **cookie**: TikTok Cookie；可选参数
-                - **proxy**: 代理；可选参数
-                - **source**: 是否返回原始响应数据；可选参数，默认值：False
-                - **mix_id**: TikTok 合集 ID；必需参数
-                - **cursor**: 可选参数
-                - **count**: 可选参数
+                - **cookie**: TikTok Cookie; optional
+                - **proxy**: Proxy; optional
+                - **source**: Return raw response data; optional, default: False
+                - **mix_id**: TikTok mix ID; required
+                - **cursor**: optional
+                - **count**: optional
                 """)
             ),
             tags=["TikTok"],
@@ -622,12 +622,12 @@ class APIServer(TikTok):
             summary=_("获取直播数据"),
             description=_(
                 dedent("""
-                **参数**:
+                **Parameters**:
 
-                - **cookie**: TikTok Cookie；可选参数
-                - **proxy**: 代理；可选参数
-                - **source**: 是否返回原始响应数据；可选参数，默认值：False
-                - **room_id**: TikTok 直播 room_id；必需参数
+                - **cookie**: TikTok Cookie; optional
+                - **proxy**: Proxy; optional
+                - **source**: Return raw response data; optional, default: False
+                - **room_id**: TikTok live room_id; required
                 """)
             ),
             tags=["TikTok"],

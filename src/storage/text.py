@@ -10,10 +10,10 @@ if TYPE_CHECKING:
 def convert_to_string(function):
     async def _convert_to_string(self, data: Union["Iterable", list], *args, **kwargs):
         for index, value in enumerate(data):
-            if isinstance(value, (int, float)):  # 如果值是数字（整型或浮点型）
-                data[index] = str(value)  # 转换为字符串
-            elif isinstance(value, list):  # 如果值是列表
-                data[index] = " ".join(value)  # 将列表元素转换为字符串并连接
+            if isinstance(value, (int, float)):  # if value is numeric
+                data[index] = str(value)  # convert to string
+            elif isinstance(value, list):  # if value is list
+                data[index] = " ".join(value)  # join list elements as string
         return await function(self, data, *args, **kwargs)
 
     return _convert_to_string

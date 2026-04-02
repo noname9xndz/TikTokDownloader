@@ -11,7 +11,7 @@ class DataResponse(BaseModel):
     @computed_field
     @property
     def time(self) -> str:
-        """格式化后的时间字符串"""
+        """Formatted time string"""
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
@@ -23,5 +23,5 @@ class UrlResponse(BaseModel):
     @computed_field
     @property
     def time(self) -> str:
-        """格式化后的时间字符串"""
+        """Formatted time string"""
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S")

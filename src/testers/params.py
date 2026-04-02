@@ -91,7 +91,7 @@ class Params:
                 "msToken",
             )
         except (NoSectionError, NoOptionError) as e:
-            print(f"读取 Cookie 错误: {e}")
+            print(f"Read Cookie error: {e}")
 
     async def __aenter__(self):
         return self

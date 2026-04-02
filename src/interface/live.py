@@ -41,7 +41,7 @@ class Live(API):
 
     async def with_web_rid(self) -> dict:
         self.set_referer("https://live.douyin.com/")
-        params = {  # TODO: 参数固定
+        params = {  # TODO: fixed parameters
             "aid": "6383",
             "app_name": "douyin_web",
             "live_id": "1",

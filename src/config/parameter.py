@@ -110,8 +110,8 @@ class Parameter:
     ):
         self.settings = settings
         self.cookie_object = cookie_object
-        self.ROOT = PROJECT_ROOT  # 项目根路径
-        self.cache = PROJECT_ROOT.joinpath("Cache")  # 缓存路径
+        self.ROOT = PROJECT_ROOT  # project root path
+        self.cache = PROJECT_ROOT.joinpath("Cache")  # cache path
         self.logger = logger(PROJECT_ROOT, console)
         self.logger.run()
         self.ab = ABogus()
@@ -315,7 +315,7 @@ class Parameter:
             for i in parameters:
                 if i:
                     self.logger.info(
-                        f"参数: {i}",
+                        f"Parameter: {i}",
                         False,
                     )
                     cookie |= i
@@ -324,7 +324,7 @@ class Parameter:
             for i in parameters:
                 if i:
                     self.logger.info(
-                        f"参数: {i}",
+                        f"Parameter: {i}",
                         False,
                     )
                     cookie += f"; {cookie_dict_to_str(i)}"
@@ -337,7 +337,7 @@ class Parameter:
             self.headers_params,
             proxy=self.proxy,
         ):
-            self.logger.info(f"抖音 {TtWid.NAME} 请求值: {tt_wid[TtWid.NAME]}", False)
+            self.logger.info(f"DouYin {TtWid.NAME} request value: {tt_wid[TtWid.NAME]}", False)
             return tt_wid
         return {}
 
@@ -356,7 +356,7 @@ class Parameter:
             proxy=self.proxy_tiktok,
         ):
             self.logger.info(
-                f"TikTok {TtWidTikTok.NAME} 请求值: {tt_wid[TtWidTikTok.NAME]}", False
+                f"TikTok {TtWidTikTok.NAME} request value: {tt_wid[TtWidTikTok.NAME]}", False
             )
             return tt_wid
         return {}
@@ -365,14 +365,14 @@ class Parameter:
         if not root:
             return self.ROOT
         if (r := Path(root)).is_dir():
-            self.logger.info(f"root 参数已设置为 {root}", False)
+            self.logger.info(f"root parameter set to {root}", False)
             return r
         if r := self.__check_root_again(r):
-            self.logger.info(f"root 参数已设置为 {r}", False)
+            self.logger.info(f"root parameter set to {r}", False)
             return r
         self.logger.warning(
             _(
-                "root 参数 {root} 不是有效的文件夹路径，程序将使用项目根路径作为储存路径"
+                "root parameter {root} is not a valid folder path, using project root as storage path"
             ).format(root=root),
         )
         return self.ROOT
@@ -388,11 +388,11 @@ class Parameter:
         if folder_name := self.CLEANER.filter_name(
             folder_name,
         ):
-            self.logger.info(f"folder_name 参数已设置为 {folder_name}", False)
+            self.logger.info(f"folder_name parameter set to {folder_name}", False)
             return folder_name
         self.logger.warning(
             _(
-                "folder_name 参数 {folder_name} 不是有效的文件夹名称，程序将使用默认值：Download"
+                "folder_name parameter {folder_name} is not a valid folder name, using default: Download"
             ).format(folder_name=folder_name),
         )
         return "Download"
@@ -400,12 +400,12 @@ class Parameter:
     def __check_name_format(self, name_format: str) -> list[str]:
         name_keys = name_format.strip().split(" ")
         if all(i in self.NAME_KEYS for i in name_keys):
-            self.logger.info(f"name_format 参数已设置为 {name_format}", False)
+            self.logger.info(f"name_format parameter set to {name_format}", False)
             return name_keys
         else:
             self.logger.warning(
                 _(
-                    "name_format 参数 {name_format} 设置错误，程序将使用默认值：创建时间 作品类型 账号昵称 作品描述"
+                    "name_format parameter {name_format} is invalid, using default: create_time type nickname desc"
                 ).format(name_format=name_format)
             )
             return ["create_time", "type", "nickname", "desc"]
@@ -413,12 +413,12 @@ class Parameter:
     def __check_date_format(self, date_format: str) -> str:
         try:
             strftime(date_format, localtime())
-            self.logger.info(f"date_format 参数已设置为 {date_format}", False)
+            self.logger.info(f"date_format parameter set to {date_format}", False)
             return date_format
         except ValueError:
             self.logger.warning(
                 _(
-                    "date_format 参数 {date_format} 设置错误，程序将使用默认值：年-月-日 时:分:秒"
+                    "date_format parameter {date_format} is invalid, using default: YYYY-MM-DD HH:MM:SS"
                 ).format(date_format=date_format),
             )
             return "%Y-%m-%d %H:%M:%S"
@@ -432,7 +432,7 @@ class Parameter:
                     )
                 )
                 return "-"
-        self.logger.info(f"split 参数已设置为 {split}", False)
+        self.logger.info(f"split parameter set to {split}", False)
         return split
 
     def __check_proxy_tiktok(
@@ -499,7 +499,7 @@ class Parameter:
 
     def __check_max_size(self, max_size: int) -> int:
         max_size = max(max_size, 0)
-        self.logger.info(f"max_size 参数已设置为 {max_size}", False)
+        self.logger.info(f"max_size parameter set to {max_size}", False)
         return max_size
 
     def __check_chunk(self, chunk: int) -> int:
@@ -520,12 +520,12 @@ class Parameter:
 
     def __check_max_pages(self, max_pages: int) -> int:
         if isinstance(max_pages, int) and max_pages > 0:
-            self.logger.info(f"max_pages 参数已设置为 {max_pages}", False)
+            self.logger.info(f"max_pages parameter set to {max_pages}", False)
             return max_pages
         elif max_pages != 0:
             self.logger.warning(
                 _(
-                    "max_pages 参数 {max_pages} 设置错误，程序将使用默认值：99999"
+                    "max_pages parameter {max_pages} is invalid, using default: 99999"
                 ).format(max_pages=max_pages),
             )
         return 99999
@@ -540,16 +540,16 @@ class Parameter:
 
     def __check_storage_format(self, storage_format: str) -> str:
         if storage_format in RecordManager.DataLogger.keys():
-            self.logger.info(f"storage_format 参数已设置为 {storage_format}", False)
+            self.logger.info(f"storage_format parameter set to {storage_format}", False)
             return storage_format
         if not storage_format:
             self.logger.info(
-                "storage_format 参数未设置，程序不会储存任何数据至文件", False
+                "storage_format not set, data will not be saved to file", False
             )
         else:
             self.logger.warning(
                 _(
-                    "storage_format 参数 {storage_format} 设置错误，程序默认不会储存任何数据至文件"
+                    "storage_format parameter {storage_format} is invalid, data will not be saved to file by default"
                 ).format(storage_format=storage_format),
             )
         return ""
@@ -622,7 +622,7 @@ class Parameter:
             else:
                 self.logger.warning(
                     _(
-                        "配置文件 cookie_tiktok 参数未设置，TikTok 平台功能可能无法正常使用"
+                        "Config cookie_tiktok is not set, TikTok features may not work properly"
                     )
                 )
 
@@ -673,7 +673,7 @@ class Parameter:
             else:
                 self.logger.warning(
                     _(
-                        "配置文件 cookie_tiktok 参数未设置，TikTok 平台功能可能无法正常使用"
+                        "Config cookie_tiktok is not set, TikTok features may not work properly"
                     )
                 )
 
@@ -752,7 +752,7 @@ class Parameter:
             proxy=self.proxy,
         ):
             self.logger.info(
-                f"抖音 MsToken 请求值: {d[MsToken.NAME]}",
+                f"DouYin MsToken request value: {d[MsToken.NAME]}",
                 False,
             )
             return d
@@ -762,7 +762,7 @@ class Parameter:
                 MsToken.NAME,
             )
             self.logger.info(
-                f"抖音 MsToken 本地值: {ms_token}",
+                f"DouYin MsToken local value: {ms_token}",
                 False,
             )
             return {MsToken.NAME: ms_token}
@@ -1017,7 +1017,7 @@ class Parameter:
         self,
         info: dict[str, str],
     ) -> None:
-        self.logger.info(f"抖音浏览器信息: {info}", False)
+        self.logger.info(f"DouYin browser info: {info}", False)
         if ua := info.get(
             "User-Agent",
         ):
@@ -1057,7 +1057,7 @@ class Parameter:
         self,
         info: dict,
     ):
-        self.logger.info(f"TikTok 浏览器信息: {info}", False)
+        self.logger.info(f"TikTok browser info: {info}", False)
         if ua := info.get(
             "User-Agent",
         ):
@@ -1115,7 +1115,7 @@ class Parameter:
     ) -> int:
         if isinstance(value, int):
             if value >= minimum:
-                self.logger.info(f"{name} 参数已设置为 {value}", False)
+                self.logger.info(f"{name} parameter set to {value}", False)
                 return value
             self.logger.warning(
                 _("{key} 参数 {value} 设置过小，程序将使用默认值：{default}").format(
@@ -1136,7 +1136,7 @@ class Parameter:
 
     def __check_live_qualities(self, live_qualities: str) -> str:
         if isinstance(live_qualities, str):
-            self.logger.info(f"live_qualities 参数已设置为 {live_qualities}", False)
+            self.logger.info(f"live_qualities parameter set to {live_qualities}", False)
             return live_qualities
         self.logger.warning(
             _("live_qualities 参数 {live_qualities} 设置错误").format(
@@ -1157,12 +1157,12 @@ class Parameter:
     @staticmethod
     def get_cookie_value(cookie_str: str, key: str, return_key=False) -> str:
         """
-        解析cookie字符串并返回指定键的值或键值对
+        Parse cookie string and return the value or key-value pair for the specified key
 
-        :param cookie_str: cookie字符串（格式如 "name=John; age=30;"）
-        :param key: 需要获取的键名
-        :param return_key: 是否返回键值对格式，默认为False
-        :return: 键值对字符串或值（若不存在返回None）
+        :param cookie_str: cookie string (e.g. "name=John; age=30;")
+        :param key: the key name to retrieve
+        :param return_key: whether to return key=value format, default False
+        :return: key=value string or value (None if not found)
         """
         cookies = {}
         for pair in cookie_str.split(";"):
@@ -1172,7 +1172,7 @@ class Parameter:
             # 分割键值（最多分割一次，应对含等号的值）
             key_value = pair.split("=", 1)
             if len(key_value) != 2:
-                continue  # 跳过无效格式
+                continue  # skip invalid format
             k, v = key_value[0].strip(), key_value[1].strip()
             cookies[k] = v
 

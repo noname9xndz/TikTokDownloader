@@ -188,9 +188,7 @@ msgstr "DouYin Cookie"
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\application\main_terminal.py:90
 #, python-brace-format
 msgid "{tip} 未登录，无法使用该功能，详细说明请查阅项目文档！"
-msgstr ""
-"{tip} Not logged in, unable to use this feature. Please refer to the project "
-"documentation for detailed information!"
+msgstr "{tip} Not logged in, unable to use this feature. Please refer to the project documentation for more details!"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\application\main_terminal.py:143
 msgid "批量下载账号作品(抖音)"
@@ -359,9 +357,7 @@ msgstr "Account"
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\application\main_terminal.py:306
 #, python-brace-format
 msgid "程序共处理 {0} 个{1}，成功 {2} 个，失败 {3} 个，耗时 {4} 分钟 {5} 秒"
-msgstr ""
-"The program processed a total of {0} {1}, with {2} successes, {3} failures, "
-"and a duration of {4} minutes {5} seconds."
+msgstr "Processed {0} {1} in total: {2} succeeded, {3} failed, took {4} min {5} sec"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\application\main_terminal.py:326
 msgid "已退出批量下载账号作品(抖音)模式"
@@ -411,9 +407,7 @@ msgstr "Starting to process the account"
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\application\main_terminal.py:571
 #, python-brace-format
 msgid "{sec_user_id} 获取账号信息失败，请检查 Cookie 登录状态！"
-msgstr ""
-"Failed to retrieve account information for {sec_user_id}, please check the "
-"Cookie login status!"
+msgstr "Failed to retrieve account info for {sec_user_id}, please check the Cookie login status!"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\application\main_terminal.py:582
 msgid ""
@@ -475,9 +469,7 @@ msgstr "Exited Batch Download Works from Links (TikTok) mode"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\application\main_terminal.py:905
 msgid "注意：本功能为实验性功能，依赖第三方 API 服务，可能不稳定或存在限制！"
-msgstr ""
-"Note: This feature is experimental and relies on unofficial API services, "
-"which may be unstable or have limitations!"
+msgstr "Note: This is an experimental feature that relies on third-party API services and may be unstable or have limitations!"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\application\main_terminal.py:911
 msgid "已退出批量下载视频原画(TikTok)模式"
@@ -535,15 +527,11 @@ msgstr "Video"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\application\main_terminal.py:1105
 msgid "程序未检测到有效的 ffmpeg，不支持直播下载功能！"
-msgstr ""
-"The program did not detect a valid ffmpeg tool, live streaming download "
-"functionality is not supported!"
+msgstr "No valid ffmpeg detected. Live stream download is not supported!"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\application\main_terminal.py:1109
 msgid "请选择下载清晰度(输入清晰度或者对应序号，直接回车代表不下载): "
-msgstr ""
-"Please select the download resolution (enter the resolution or corresponding "
-"number, press Enter to skip download):"
+msgstr "Select download quality (enter quality or number, press Enter to skip): "
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\application\main_terminal.py:1116
 msgid "未输入有效的清晰度或者序号，跳过下载！"
@@ -723,9 +711,7 @@ msgstr "Failed to collect Mix Works data"
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\application\main_terminal.py:1730
 #, python-brace-format
 msgid "配置文件 accounts_urls 参数第 {index} 条数据的 url 无效"
-msgstr ""
-"The URL in parameter {index} of the `accounts_urls` in the configuration "
-"file is invalid"
+msgstr "The URL at index {index} in the accounts_urls config parameter is invalid"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\application\main_terminal.py:1754
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\cli_edition\write.py:40
@@ -760,9 +746,7 @@ msgstr "Exited Collect Account Detailed Data mode."
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\application\main_terminal.py:1832
 #, python-brace-format
 msgid "请输入搜索参数；参数之间使用两个空格分隔({field})：\n"
-msgstr ""
-"Please enter search parameters; Separate parameters with two spaces "
-"({field}): \n"
+msgstr "Enter search parameters separated by double spaces ({field}):\n"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\application\main_terminal.py:1855
 msgid "请选择搜索模式"
@@ -811,8 +795,7 @@ msgstr "Collections"
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\application\main_terminal.py:2137
 #, python-brace-format
 msgid "配置文件 owner_url 的 url 参数 {url} 无效"
-msgstr ""
-"The URL parameter {url} of owner_url in the configuration file is invalid."
+msgstr "The url parameter {url} in config owner_url is invalid"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\application\main_terminal.py:2167
 msgid "已退出批量下载收藏音乐(抖音)模式"
@@ -931,8 +914,7 @@ msgstr "New version detected: {major}.{minor}"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\application\TikTokDownloader.py:255
 msgid "当前版本为开发版, 可更新至正式版"
-msgstr ""
-"The current version is a development version, update to the stable version."
+msgstr "Current version is a development build, can be updated to the release version"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\application\TikTokDownloader.py:260
 msgid "当前已是最新开发版"
@@ -982,9 +964,7 @@ msgstr "{name} parameter format error"
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\config\parameter.py:366
 #, python-brace-format
 msgid "root 参数 {root} 不是有效的文件夹路径，程序将使用项目根路径作为储存路径"
-msgstr ""
-"The root parameter {root} is not a valid folder path. The program will use "
-"the project root path as the storage path."
+msgstr "root parameter {root} is not a valid folder path, the program will use the project root as the storage path"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\config\parameter.py:386
 #, python-brace-format
@@ -1015,16 +995,12 @@ msgstr ""
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\config\parameter.py:421
 #, python-brace-format
 msgid "split 参数 {split} 包含非法字符，程序将使用默认值：-"
-msgstr ""
-"split parameter {split} contains illegal characters. The program will use "
-"the default value: -"
+msgstr "split parameter {split} contains illegal characters, the program will use the default: -"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\config\parameter.py:451
 #, python-brace-format
 msgid "{remark}代理参数应为字符串格式，未来不再支持字典格式"
-msgstr ""
-"{remark} proxy parameter should be in string format. Dictionary format will "
-"no longer be supported in the future."
+msgstr "{remark} proxy parameter should be a string format; dictionary format will no longer be supported"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\config\parameter.py:467
 #, python-brace-format
@@ -1044,9 +1020,7 @@ msgstr "{remark} proxy {proxy} test failed: {error}"
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\config\parameter.py:519
 #, python-brace-format
 msgid "max_pages 参数 {max_pages} 设置错误，程序将使用默认值：99999"
-msgstr ""
-"max_pages parameter {max_pages} is set incorrectly. The program will use the "
-"default value: 99999"
+msgstr "max_pages parameter {max_pages} is invalid, the program will use the default: 99999"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\config\parameter.py:543
 #, python-brace-format
@@ -1067,9 +1041,7 @@ msgstr "DouYin parameters update completed!"
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\config\parameter.py:583
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\config\parameter.py:644
 msgid "配置文件 cookie 参数未设置，抖音平台功能可能无法正常使用"
-msgstr ""
-"The cookie parameter is not configured in the settings file. DouYin platform "
-"features may not work properly."
+msgstr "Config cookie parameter is not set; DouYin features may not work properly"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\config\parameter.py:593
 msgid "正在更新 TikTok 参数，请稍等..."
@@ -1082,36 +1054,27 @@ msgstr "TikTok parameters update completed!"
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\config\parameter.py:616
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\config\parameter.py:667
 msgid "配置文件 cookie_tiktok 参数未设置，TikTok 平台功能可能无法正常使用"
-msgstr ""
-"The cookie_tiktok parameter is not configured in the settings file. TikTok "
-"platform features may not work properly."
+msgstr "Config cookie_tiktok parameter is not set; TikTok features may not work properly"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\config\parameter.py:772
 #, python-brace-format
 msgid "TikTok cookie 缺少 {name} 键值对，请尝试重新写入 cookie"
-msgstr ""
-"The TikTok cookie is missing the {name} key-value pair. Please attempt to "
-"rewrite the cookie."
+msgstr "TikTok cookie is missing the {name} key-value pair, please try re-writing the cookie"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\config\parameter.py:1112
 #, python-brace-format
 msgid "{key} 参数 {value} 设置过小，程序将使用默认值：{default}"
-msgstr ""
-"The parameter {key} has been set to a value ({value}) that is too small. The "
-"program will use the default value instead: {default}"
+msgstr "{key} parameter {value} is too small, the program will use the default: {default}"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\config\parameter.py:1120
 #, python-brace-format
 msgid "{key} 参数 {value} 设置错误，程序将使用默认值：{default}"
-msgstr ""
-"The parameter {key} is incorrectly configured ({value}). The program will "
-"use the default value: {default}."
+msgstr "{key} parameter {value} is invalid, the program will use the default: {default}"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\config\parameter.py:1133
 #, python-brace-format
 msgid "live_qualities 参数 {live_qualities} 设置错误"
-msgstr ""
-"The live_qualities parameter is incorrectly configured: {live_qualities}"
+msgstr "live_qualities parameter {live_qualities} is invalid"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\config\settings.py:157
 msgid ""
@@ -1127,16 +1090,12 @@ msgstr ""
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\config\settings.py:174
 msgid "配置文件 settings.json 格式错误，请检查 JSON 格式！"
-msgstr ""
-"The configuration file settings.json has an error. Please check the JSON "
-"format!"
+msgstr "settings.json format error, please check the JSON format!"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\config\settings.py:186
 #, python-brace-format
 msgid "配置文件 settings.json 缺少参数 {i}，已自动添加该参数！"
-msgstr ""
-"The configuration file settings.json is missing the parameter \"{i}\". The "
-"program has automatically added this parameter."
+msgstr "settings.json is missing parameter {i}, it has been automatically added!"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\config\settings.py:204
 msgid "保存配置成功！"
@@ -1145,9 +1104,7 @@ msgstr "Configuration saved successfully!"
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\config\settings.py:216
 #, python-brace-format
 msgid "配置文件 {old} 参数已变更为 {new} 参数，请注意修改配置文件！"
-msgstr ""
-"The configuration file parameter {old} has been changed to {new}. Please "
-"make sure to update the configuration file accordingly!"
+msgstr "Config parameter {old} has been renamed to {new}, please update the configuration file!"
 
 msgid ""
 "关于 DouK-Downloader 的 免责声明：\n"
@@ -1275,9 +1232,7 @@ msgstr "Music"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\downloader\download.py:255
 msgid "程序将会调用 ffmpeg 下载直播，关闭 DouK-Downloader 不会中断下载！"
-msgstr ""
-"The program will call ffmpeg to download the live stream. Closing DouK-"
-"Downloader will not interrupt the download!"
+msgstr "The program will use ffmpeg to download the live stream. Closing DouK-Downloader will not interrupt the download!"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\downloader\download.py:332
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\downloader\download.py:335
@@ -1290,8 +1245,7 @@ msgstr "LivePhoto"
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\downloader\download.py:460
 #, python-brace-format
 msgid "【{type}】{name} 提取文件下载地址失败，跳过下载"
-msgstr ""
-"【{type}】{name} failed to retrieve the file download URL, skipping download."
+msgstr "[{type}] {name} failed to extract download URL, skipping download"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\downloader\download.py:421
 #, python-brace-format
@@ -1306,14 +1260,12 @@ msgstr "【{type}】{name}_{index} file already exists, skipping download."
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\downloader\download.py:472
 #, python-brace-format
 msgid "【{type}】{name} 存在下载记录或文件已存在，跳过下载"
-msgstr ""
-"【{type}】{name} has a download record or file already exists, skipping "
-"download."
+msgstr "[{type}] {name} download record exists or file already exists, skipping download"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\downloader\download.py:514
 #, python-brace-format
 msgid "【{type}】{name}"
-msgstr ""
+msgstr "[{type}] {name}"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\downloader\download.py:622
 msgid "文件缓存异常，尝试重新下载"
@@ -1341,9 +1293,7 @@ msgstr ""
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\downloader\download.py:679
 #, python-brace-format
 msgid "下载文件时发生预期之外的错误，请向作者反馈，错误信息: {error}"
-msgstr ""
-"An unexpected error occurred while downloading the file. Please report it to "
-"the author, error information: {error}"
+msgstr "An unexpected error occurred while downloading. Please report to the author. Error: {error}"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\downloader\download.py:715
 #, python-brace-format
@@ -1464,8 +1414,7 @@ msgstr "sec_user_id {user_id} does not match {s}"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\extract\extractor.py:944
 msgid "提取账号信息或合集信息失败，请向作者反馈！"
-msgstr ""
-"Failed to extract Account or Mix information, please report to the author!"
+msgstr "Failed to extract account or collection info, please report to the author!"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\interface\account.py:41
 msgid "账号喜欢作品"
@@ -1486,9 +1435,7 @@ msgstr ""
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\interface\account.py:207
 #, python-brace-format
 msgid "tab 参数 {tab} 设置错误，程序将使用默认值: post"
-msgstr ""
-"tab parameter {tab} is set incorrectly, the program will use the default "
-"value: post"
+msgstr "tab parameter {tab} is invalid, the program will use the default: post"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\interface\account.py:212
 msgid "最早"
@@ -1515,9 +1462,7 @@ msgstr "{tip} publish date of the works: {latest_date}"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\interface\account.py:261
 msgid "配置文件 cookie 参数未登录，数据获取已提前结束"
-msgstr ""
-"Cookie parameter in the configuration file is not logged in, data retrieval "
-"has ended prematurely"
+msgstr "Config cookie is not logged in, data retrieval ended early"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\interface\account.py:264
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\interface\comment.py:200
@@ -1628,9 +1573,7 @@ msgstr "Failed to retrieve {text}"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\interface\live_tiktok.py:57
 msgid "此直播可能会令部分观众感到不适，请登录后重试！"
-msgstr ""
-"This live stream may cause discomfort to some viewers. Please log in and try "
-"again!"
+msgstr "This live stream may be uncomfortable for some viewers. Please log in and try again!"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\interface\mix.py:71
 msgid "获取合集 ID 失败"
@@ -1662,14 +1605,11 @@ msgstr "LiveSearch"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\interface\search.py:60
 msgid "关键词  总页数  排序依据  发布时间  视频时长  搜索范围  内容形式"
-msgstr ""
-"keyword  TotalPages  SortType  PublicationTime  VideoDuration  SearchRange  "
-"ContentForm"
+msgstr "Keyword  Pages  SortBy  PublishTime  Duration  SearchRange  ContentType"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\interface\search.py:61
 msgid "关键词  总页数  排序依据  发布时间  视频时长  搜索范围"
-msgstr ""
-"keyword  TotalPages  SortType  PublicationTime  VideoDuration  SearchRange"
+msgstr "Keyword  Pages  SortBy  PublishTime  Duration  SearchRange"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\interface\search.py:62
 msgid "关键词  总页数  粉丝数量  用户类型"
@@ -1805,9 +1745,7 @@ msgstr "The current clipboard content is not valid Cookie data!"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\storage\sqlite.py:83
 msgid "更新数据表名称时发生错误，重命名失败，请向作者反馈以便修复问题！"
-msgstr ""
-"An error occurred while updating the data table name. The rename operation "
-"failed. Please report this issue to the developer for a fix."
+msgstr "An error occurred while updating the table name. Rename failed, please report to the author!"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\storage\xlsx.py:62
 #, python-brace-format
@@ -1852,8 +1790,7 @@ msgstr "Failed to read Cookie, no Cookie data found!"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\tools\browser.py:164
 msgid "从浏览器读取 Cookie 功能不支持当前平台！"
-msgstr ""
-"Reading Cookie from the browser is not supported on the current platform!"
+msgstr "Reading cookies from the browser is not supported on the current platform!"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\tools\capture.py:26
 msgid "响应内容不是有效的 JSON 数据"
@@ -1885,9 +1822,7 @@ msgstr "Response content is not valid JSON data, Please try updating cookies!"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\tools\cleaner.py:46
 msgid "不受支持的操作系统类型，可能无法正常去除非法字符！"
-msgstr ""
-"Unsupported operating system type, illegal characters may not be removed "
-"properly!"
+msgstr "Unsupported OS type, illegal characters might not be removed properly!"
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\tools\error.py:9
 msgid "项目代码错误"
@@ -1910,9 +1845,7 @@ msgstr ""
 
 #: C:\Users\You\PycharmProjects\TikTokDownloader\src\tools\retry.py:63
 msgid "请关闭所有正在访问该对象的窗口或程序，然后按下回车键继续处理！"
-msgstr ""
-"Please close all windows or programs accessing this object, then press Enter "
-"to continue processing!"
+msgstr "Please close all windows or programs accessing this object, then press Enter to continue!"
 
 msgid ""
 "\n"

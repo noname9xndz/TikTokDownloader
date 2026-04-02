@@ -508,22 +508,22 @@ class ABogus:
     @classmethod
     def sm3_to_array(cls, data: str | list) -> list[int]:
         """
-        代码参考: https://github.com/Johnserf-Seed/f2/blob/main/f2/utils/abogus.py
+        Code reference: https://github.com/Johnserf-Seed/f2/blob/main/f2/utils/abogus.py
 
-        计算请求体的 SM3 哈希值，并将结果转换为整数数组
+        Calculate SM3 hash of the request body and convert to integer array
         Calculate the SM3 hash value of the request body and convert the result to an array of integers
 
         Args:
-            data (Union[str, List[int]]): 输入数据 (Input data).
+            data (Union[str, List[int]]): Input data.
 
         Returns:
-            List[int]: 哈希值的整数数组 (Array of integers representing the hash value).
+            List[int]: Array of integers representing the hash value.
         """
 
         if isinstance(data, str):
             b = data.encode("utf-8")
         else:
-            b = bytes(data)  # 将 List[int] 转换为字节数组
+            b = bytes(data)  # convert List[int] to bytes
 
         # 将字节数组转换为适合 sm3.sm3_hash 函数处理的列表格式
         h = sm3.sm3_hash(func.bytes_to_list(b))

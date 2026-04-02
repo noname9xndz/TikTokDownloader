@@ -15,7 +15,7 @@ __all__ = ["SQLLogger"]
 
 
 class SQLLogger(BaseSQLLogger):
-    """SQLite 数据库保存数据"""
+    """Save data to SQLite database"""
 
     def __init__(
         self,
@@ -30,13 +30,13 @@ class SQLLogger(BaseSQLLogger):
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
-        self.db = None  # 数据库
-        self.cursor = None  # 游标对象
-        self.name = (old, name)  # 数据表名称
-        self.file = db_name  # 数据库文件名称
+        self.db = None  # database
+        self.cursor = None  # cursor object
+        self.name = (old, name)  # table name
+        self.file = db_name  # database file name
         self.path = root.joinpath(self.file)
-        self.title_line = title_line  # 数据表列名
-        self.title_type = title_type  # 数据表数据类型
+        self.title_line = title_line  # table column names
+        self.title_type = title_type  # table data types
         self.field_keys = field_keys
 
     async def __aenter__(self):
@@ -80,7 +80,7 @@ class SQLLogger(BaseSQLLogger):
                         " ".join(
                             (
                                 _(
-                                    "更新数据表名称时发生错误，重命名失败，请向作者反馈以便修复问题！"
+                                    "Error updating table name. Rename failed, please report to the author!"
                                 ),
                                 str(e),
                                 old_sheet,

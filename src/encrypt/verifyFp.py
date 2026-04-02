@@ -52,7 +52,7 @@ class VerifyFp:
         # 随机填充缺失的字符
         for i in range(36):
             if not o[i]:
-                n = int(random() * t)  # 优化随机数生成方式
+                n = int(random() * t)  # optimized random number generation
                 if i == 19:
                     n = 3 & n | 8
                 o[i] = base_str[n]

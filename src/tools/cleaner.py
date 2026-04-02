@@ -17,13 +17,13 @@ class Cleaner:
 
     def __init__(self):
         """
-        替换字符串中包含的非法字符，默认根据系统类型生成对应的非法字符字典，也可以自行设置非法字符字典
+        Replace illegal characters in strings, generating platform-specific rules by default
         """
-        self.rule = self.default_rule()  # 默认非法字符字典
+        self.rule = self.default_rule()  # default illegal char rules
 
     @staticmethod
     def default_rule():
-        """根据系统类型生成默认非法字符字典"""
+        """Generate default illegal character rules based on OS type"""
         if (s := system()) in ("Windows", "Darwin"):
             rule = {
                 "/": "",
@@ -36,33 +36,33 @@ class Cleaner:
                 ":": "",
                 "*": "",
                 "\x00": "",
-            }  # Windows 系统和 Mac 系统
+            }  # Windows and macOS
         elif s == "Linux":
             rule = {
                 "/": "",
                 "\x00": "",
-            }  # Linux 系统
+            }  # Linux
         else:
-            print(_("不受支持的操作系统类型，可能无法正常去除非法字符！"))
+            print(_("不受支持的操作系统类型，可能无法正常Remove illegal characters！"))
             rule = {}
-        cache = {i: "" for i in whitespace[1:]}  # 补充换行符等非法字符
+        cache = {i: "" for i in whitespace[1:]}  # add whitespace chars
         return rule | cache
 
     def set_rule(self, rule: dict[str, str], update=False):
         """
-        设置非法字符字典
+        Set illegal character rules
 
-        :param rule: 替换规则，字典格式，键为非法字符，值为替换后的内容
-        :param update: 如果是 True，则与原有规则字典合并，否则替换原有规则字典
+        :param rule: replacement rules dict, keys are illegal chars, values are replacements
+        :param update: if True, merge with existing rules; otherwise replace
         """
         self.rule = {**self.rule, **rule} if update else rule
 
     def filter(self, text: str) -> str:
         """
-        去除非法字符
+        Remove illegal characters
 
-        :param text: 待处理的字符串
-        :return: 替换后的字符串，如果替换后字符串为空，则返回 None
+        :param text: the string to process
+        :return: cleaned string, or None if result is empty
         """
         for i in self.rule:
             text = text.replace(i, self.rule[i])
@@ -73,7 +73,7 @@ class Cleaner:
         text: str,
         default: str = "",
     ) -> str:
-        """过滤文件夹名称中的非法字符"""
+        """Filter illegal characters from folder names"""
         text = text.replace(":", ".")
 
         text = self.remove_control_characters(text)
@@ -90,7 +90,7 @@ class Cleaner:
 
     @staticmethod
     def clear_spaces(string: str):
-        """将连续的空格转换为单个空格"""
+        """Collapse consecutive spaces into a single space"""
         return " ".join(string.split())
 
     @classmethod

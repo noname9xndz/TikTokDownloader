@@ -38,7 +38,7 @@ class ClipboardMonitor(TikTok):
     ):
         self.console.info(
             _(
-                "程序会自动检测并提取剪贴板中的抖音和 TikTok 作品链接，并自动下载作品文件；如需关闭，请按下 Ctrl+C，或将剪贴板内容设置为“close”以停止监听！"
+                "The program will automatically detect and extract DouYin and TikTok links from the clipboard and download files. To stop, press Ctrl+C or set clipboard to \"close\"!"
             ),
         )
         copy("")
@@ -56,14 +56,14 @@ class ClipboardMonitor(TikTok):
         )
 
     async def stop_listener(self):
-        self.console.debug("停止监听剪贴板！")
+        self.console.debug("Clipboard monitoring stopped!")
         self.event_clipboard.set()
 
     async def check_clipboard(
         self,
         delay: int | float = 1,
     ):
-        self.console.debug("开始监听剪贴板！")
+        self.console.debug("Clipboard monitoring started!")
         while not self.event_clipboard.is_set():
             if (c := paste()).lower() == "close":
                 await self.stop_listener()
@@ -79,10 +79,10 @@ class ClipboardMonitor(TikTok):
         links = text.split()
         for i in links:
             if "douyin" in i:
-                self.console.debug(f"处理抖音链接: {i}")
+                self.console.debug(f"Processing DouYin link: {i}")
                 await self.queue_dy.put(i)
             elif "tiktok" in i:
-                self.console.debug(f"处理 TikTok 链接: {i}")
+                self.console.debug(f"Processing TikTok link: {i}")
                 await self.queue_tk.put(i)
 
     async def deal_tasks(

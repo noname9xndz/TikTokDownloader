@@ -121,7 +121,7 @@ def make_mix_factory(
     database: "Database",
     tiktok: bool = False,
 ) -> CoroFactory:
-    """Factory for mix (合集) downloads."""
+    """Factory for mix (collection) downloads."""
 
     async def _run(urls: List[str]) -> None:
         t = _new_tiktok(parameter, database)
@@ -219,7 +219,7 @@ def make_collection_factory(
     parameter: "Parameter",
     database: "Database",
 ) -> CoroFactory:
-    """Factory for downloading starred/collected works (收藏作品)."""
+    """Factory for downloading starred/collected works."""
 
     async def _run(_urls: List[str]) -> None:
         t = _new_tiktok(parameter, database)
@@ -237,7 +237,7 @@ def make_collects_factory(
     parameter: "Parameter",
     database: "Database",
 ) -> CoroFactory:
-    """Factory for downloading folder-collected works (收藏夹作品)."""
+    """Factory for downloading folder-collected works."""
 
     async def _run(_urls: List[str]) -> None:
         t = _new_tiktok(parameter, database)
@@ -250,7 +250,7 @@ def make_collection_music_factory(
     parameter: "Parameter",
     database: "Database",
 ) -> CoroFactory:
-    """Factory for downloading collected music (收藏音乐)."""
+    """Factory for downloading collected music."""
 
     async def _run(_urls: List[str]) -> None:
         t = _new_tiktok(parameter, database)

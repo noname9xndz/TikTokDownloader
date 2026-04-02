@@ -13,7 +13,7 @@ __all__ = ["CSVLogger"]
 
 
 class CSVLogger(BaseTextLogger):
-    """CSV 格式保存数据"""
+    """Save data in CSV format"""
 
     __type = "csv"
     encode = "UTF-8-SIG" if system() == "Windows" else "UTF-8"
@@ -31,11 +31,11 @@ class CSVLogger(BaseTextLogger):
     ):
         super().__init__(*args, **kwargs)
         self.console = console
-        self.file = None  # 文件对象
-        self.writer = None  # CSV对象
-        self.name = self._rename(root, self.__type, old, name)  # 文件名称
-        self.path = root.joinpath(f"{self.name}.{self.__type}")  # 文件路径
-        self.title_line = title_line  # 标题行
+        self.file = None  # file object
+        self.writer = None  # CSV writer object
+        self.name = self._rename(root, self.__type, old, name)  # file name
+        self.path = root.joinpath(f"{self.name}.{self.__type}")  # file path
+        self.title_line = title_line  # title row
         self.field_keys = field_keys
 
     async def __aenter__(self):

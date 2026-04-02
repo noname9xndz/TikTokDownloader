@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 
 class LoggerManager(BaseLogger):
-    """日志记录"""
+    """Logging"""
 
     encode = "UTF-8-SIG" if system() == "Windows" else "UTF-8"
 

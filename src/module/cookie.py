@@ -31,7 +31,7 @@ class Cookie:
         self,
         tiktok=False,
     ) -> bool:
-        """提取 Cookie 并写入配置文件"""
+        """Extract Cookie and write to configuration file"""
         if self.validate_cookie_minimal(cookie := paste()):
             self.extract(
                 cookie,
@@ -79,9 +79,9 @@ class Cookie:
     @classmethod
     def validate_cookie_minimal(cls, cookie_str: str) -> bool:
         """
-        只检查整个字符串中是否存在 key=value 子串，
-        且 key 和 value 都非空。
-        返回 True 或 False。
+        Check if the string contains a key=value substring
+        where both key and value are non-empty.
+        Returns True or False.
         """
         if not isinstance(cookie_str, str):
             return False

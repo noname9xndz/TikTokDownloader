@@ -109,7 +109,7 @@ class Downloader:
         return FakeProgress()
 
     def __general_progress_object(self):
-        """文件下载进度条"""
+        """File download progress bar"""
         return Progress(
             TextColumn(
                 "[progress.description]{task.description}",
@@ -129,7 +129,7 @@ class Downloader:
         )
 
     def __live_progress_object(self):
-        """直播下载进度条"""
+        """Live stream download progress bar"""
         return Progress(
             TextColumn(
                 "[progress.description]{task.description}",
@@ -375,7 +375,7 @@ class Downloader:
         name: str,
         folder_mode=False,
     ) -> tuple[Path, Path]:
-        """生成文件的临时路径和目标路径"""
+        """Generate temporary and target file paths"""
         root = self.create_detail_folder(root, name, folder_mode)
         root.mkdir(exist_ok=True)
         cache = self.cache.joinpath(name)
@@ -429,7 +429,7 @@ class Downloader:
                         type=type_, name=name, index=index
                     )
                 )
-                self.log.info(f"文件路径: {p.resolve()}", False)
+                self.log.info(f"File path: {p.resolve()}", False)
                 skipped.add(id_)
                 continue
             tasks.append(
@@ -473,7 +473,7 @@ class Downloader:
                     type=type_, name=name
                 )
             )
-            self.log.info(f"文件路径: {p.resolve()}", False)
+            self.log.info(f"File path: {p.resolve()}", False)
             skipped.add(id_)
             return
         tasks.append(
@@ -546,7 +546,7 @@ class Downloader:
                     url,
                     temp_root.with_name(f"{name}.{static_suffix}"),
                     p,
-                    f"【封面】{name}",
+                    f"[Cover] {name}",
                     id_,
                     static_suffix,
                 )
@@ -565,7 +565,7 @@ class Downloader:
                     url,
                     temp_root.with_name(f"{name}.{dynamic_suffix}"),
                     p,
-                    f"【动图】{name}",
+                    f"[GIF] {name}",
                     id_,
                     dynamic_suffix,
                 )
@@ -577,7 +577,7 @@ class Downloader:
         path: Path,
         switch=False,
     ) -> bool:
-        """未传入 switch 参数则判断音乐下载开关设置"""
+        """Check music download switch when no switch param is passed"""
         return all((switch or self.music, url, not self.is_exists(path)))
 
     @Retry.retry
@@ -665,7 +665,7 @@ class Downloader:
                 )
                 self.console.warning(
                     _(
-                        "如果 TikTok 平台作品下载功能异常，请检查配置文件中 browser_info_tiktok 的 device_id 参数！"
+                        "If TikTok download is abnormal, please check browser_info_tiktok device_id in config!"
                     ),
                 )
                 return False
@@ -676,7 +676,7 @@ class Downloader:
             except Exception as e:
                 self.log.error(
                     _(
-                        "下载文件时发生预期之外的错误，请向作者反馈，错误信息: {error}"
+                        "Unexpected error during download, please report. Error: {error}"
                     ).format(error=repr(e)),
                 )
                 self.log.error(f"URL: {url}", False)
@@ -719,7 +719,7 @@ class Downloader:
             return False
         self.save_file(cache, actual)
         self.log.info(_("{show} 文件下载成功").format(show=show))
-        self.log.info(f"文件路径 {actual.resolve()}", False)
+        self.log.info(f"File path: {actual.resolve()}", False)
         await self.recorder.update_id(id_)
         self.add_count(show, id_, count)
         return True
@@ -800,7 +800,7 @@ class Downloader:
         return folder
 
     def generate_detail_name(self, data: dict) -> str:
-        """生成作品文件名称"""
+        """Generate post file name"""
         return beautify_string(
             self.cleaner.filter_name(
                 self.split.join(data[i] for i in self.name_format),
@@ -810,7 +810,7 @@ class Downloader:
         )
 
     def generate_music_name(self, data: dict) -> str:
-        """生成音乐文件名称"""
+        """Generate music file name"""
         return beautify_string(
             self.cleaner.filter_name(
                 self.split.join(
@@ -891,7 +891,7 @@ class Downloader:
         self.log.info(f"{show} Response Code: {response.status_code}", False)
         self.log.info(f"{show} Response Headers: {response.headers}", False)
         self.log.info(
-            f"{show} 文件大小 {format_size(length)}",
+            f"{show} file size {format_size(length)}",
             False,
         )
 
@@ -963,16 +963,16 @@ class Downloader:
         unknown_size: bool,
         show: str,
     ) -> int:
-        if not length and not unknown_size:  # 响应内容大小判断
+        if not length and not unknown_size:  # check response content size
             self.log.warning(_("{show} 响应内容为空").format(show=show))
-            return -1  # 执行重试
+            return -1  # retry
         if all(
             (
                 self.max_size,
                 length,
                 length > self.max_size,
             )
-        ):  # 文件下载跳过判断
+        ):  # file download skip check
             self.log.info(_("{show} 文件大小超出限制，跳过下载").format(show=show))
-            return 0  # 跳过下载
-        return 1  # 继续下载
+            return 0  # skip download
+        return 1  # proceed with download

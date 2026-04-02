@@ -77,10 +77,10 @@ class Browser:
             select
             or self.console.input(
                 _(
-                    "读取指定浏览器的 {platform_name} Cookie 并写入配置文件；\n"
-                    "注意：Windows 系统需要以管理员身份运行程序才能读取 Chromium、Chrome、Edge 浏览器 Cookie！\n"
+                    "Read {platform_name} Cookie from the specified browser and write to config;\n"
+                    "Note: On Windows, run as Administrator to read Chromium, Chrome, Edge browser Cookies!\n"
                     "{options}\n"
-                    "请输入浏览器名称或序号："
+                    "Enter browser name or number:"
                 ).format(
                     platform_name=self.PLATFORM[tiktok].name, options=self.options
                 ),

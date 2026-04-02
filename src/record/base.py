@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 
 class BaseLogger:
-    """不记录日志，空白日志记录器"""
+    """No logging, blank logger"""
 
     DEBUG = VERSION_BETA
 
@@ -29,7 +29,7 @@ class BaseLogger:
         folder="",
         name="",
     ):
-        self.log = None  # 记录器主体
+        self.log = None  # logger instance
         self.console = console
         self._root, self._folder, self._name = self.init_check(
             main_path=main_path,
@@ -56,7 +56,7 @@ class BaseLogger:
         if (r := Path(root)).is_dir():
             return r
         self.console.print(
-            f"日志储存路径 {root} 无效，程序将使用项目根路径作为储存路径"
+            f"Log storage path {root} is invalid, using project root as storage path"
         )
         return default
 
@@ -68,7 +68,7 @@ class BaseLogger:
             return name
         except ValueError:
             self.console.print(
-                f"日志名称格式 {name} 无效，程序将使用默认时间格式：年-月-日 时.分.秒"
+                f"Log name format {name} is invalid, using default: YYYY-MM-DD HH.MM.SS"
             )
             return "%Y-%m-%d %H.%M.%S"
 

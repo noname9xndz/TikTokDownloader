@@ -81,9 +81,9 @@ class Settings:
         "twc_tiktok": "",
         "download": True,
         "max_size": 0,
-        "chunk": 1024 * 1024 * 2,  # 每次从服务器接收的数据块大小
+        "chunk": 1024 * 1024 * 2,  # chunk size per server response
         "timeout": 10,
-        "max_retry": 5,  # 重试最大次数
+        "max_retry": 5,  # maximum retry count
         "max_pages": 0,
         "run_command": "",
         "ffmpeg": "",
@@ -118,7 +118,7 @@ class Settings:
             "webcast_language": "zh-Hans",
             "device_id": "",
         },
-    }  # 默认配置
+    }  # default config
     rename_params = (
         (
             "default_mode",
@@ -140,40 +140,40 @@ class Settings:
             "static_cover",
             False,
         ),
-    )  # 兼容旧版本配置文件
+    )  # compatible with older config files
 
     def __init__(self, root: "Path", console: "ColorfulConsole"):
         self.root = root
         self.file = "settings.json"
-        self.path = root.joinpath(self.file)  # 配置文件
+        self.path = root.joinpath(self.file)  # config file
         self.console = console
 
     def __create(self) -> dict:
-        """创建默认配置文件"""
+        """Create default configuration file"""
         with self.path.open("w", encoding=self.encode) as f:
             dump(self.default, f, indent=4, ensure_ascii=False)
         self.console.info(
             _(
-                "创建默认配置文件 settings.json 成功！\n"
-                "请参考项目文档的快速入门部分，设置 Cookie 后重新运行程序！\n"
-                "建议根据实际使用需求修改配置文件 settings.json！\n"
+                "Default configuration file settings.json created successfully!\n"
+                "Please refer to the Quick Start section of the project documentation, set Cookie and re-run!\n"
+                "It is recommended to modify settings.json according to your needs!\n"
             ),
         )
         return self.default
 
     def read(self) -> dict:
-        """读取配置文件，如果没有配置文件，则生成配置文件"""
+        """Read config file, create default if not found"""
         self.compatible()
         try:
             if self.path.exists():
                 with self.path.open("r", encoding=self.encode) as f:
                     return self.__check(load(f))
-            return self.__create()  # 生成的默认配置文件必须设置 cookie 才可以正常运行
+            return self.__create()  # must set cookie to function
         except JSONDecodeError:
             self.console.error(
                 _("配置文件 settings.json 格式错误，请检查 JSON 格式！"),
             )
-            return self.default  # 读取配置文件发生错误时返回空配置
+            return self.default  # return defaults on read error
 
     def __check(self, data: dict) -> dict:
         data = self.__compatible_with_old_settings(data)
@@ -192,7 +192,7 @@ class Settings:
         return data
 
     def update(self, settings: dict | SimpleNamespace):
-        """更新配置文件"""
+        """Update configuration file"""
         with self.path.open("w", encoding=self.encode) as f:
             dump(
                 settings if isinstance(settings, dict) else vars(settings),
@@ -208,12 +208,12 @@ class Settings:
         self,
         data: dict,
     ) -> dict:
-        """兼容旧版本配置文件"""
+        """Backward-compatible with older config files"""
         for old, new_, default in self.rename_params:
             if old in data:
                 self.console.info(
                     _(
-                        "配置文件 {old} 参数已变更为 {new} 参数，请注意修改配置文件！"
+                        "Config parameter {old} has been renamed to {new}, please update your configuration file!"
                     ).format(old=old, new=new_),
                 )
                 data[new_] = data.get(

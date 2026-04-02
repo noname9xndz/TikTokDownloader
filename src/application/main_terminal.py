@@ -68,7 +68,7 @@ def check_storage_format(function):
             return await function(self, *args, **kwargs)
         self.console.warning(
             _(
-                "未设置 storage_format 参数，无法正常使用该功能，详细说明请查阅项目文档！"
+                "storage_format parameter is not set, this feature cannot be used. Refer to project docs!"
             ),
         )
 
@@ -303,7 +303,7 @@ class TikTok:
         time_ = time() - count.time
         self.logger.info(
             _(
-                "程序共处理 {0} 个{1}，成功 {2} 个，失败 {3} 个，耗时 {4} 分钟 {5} 秒"
+                "Processed {0} {1} total: {2} succeeded, {3} failed, took {4} min {5} sec"
             ).format(
                 count.success + count.failed,
                 name,
@@ -390,7 +390,7 @@ class TikTok:
             ):
                 self.logger.warning(
                     _(
-                        "配置文件 {name} 参数的 url {url} 提取 sec_user_id 失败，错误配置：{data}"
+                        "Failed to extract sec_user_id from url {url} in config {name}, error config: {data}"
                     ).format(
                         name=params_name,
                         url=data.url,
@@ -579,7 +579,7 @@ class TikTok:
                 return None
             self.logger.info(
                 _(
-                    "如果账号发布作品均为共创作品且该账号均不是作品作者时，请配置已登录的 Cookie 后重新运行程序，其余情况请无视该提示！"
+                    "If all posts are co-created and this account is not the author, please configure a logged-in Cookie and re-run. Otherwise ignore this message!"
                 )
             )
         acquirer = self._get_account_data_tiktok if tiktok else self._get_account_data
@@ -1517,7 +1517,7 @@ class TikTok:
             self.console.print(f"{i}. {j[key]}")
         index = select or self.console.input(
             _(
-                "请输入需要下载的{item}序号(多个序号使用空格分隔，输入 ALL 下载全部{item})："
+                "Enter the {item} number(s) to download (space-separated, or ALL for all {item}):"
             ).format(item=text)
         )
         try:
@@ -1625,7 +1625,7 @@ class TikTok:
             if not id_:
                 self.logger.warning(
                     _(
-                        "配置文件 {name} 参数的 url {url} 获取作品 ID 或合集 ID 失败，错误配置：{data}"
+                        "Failed to get post ID or mix ID from url {url} in config {name}, error config: {data}"
                     ).format(
                         name=params_name,
                         url=data.url,
@@ -1858,7 +1858,7 @@ class TikTok:
             function=self.__function_search,
             select=select or safe_pop(self.run_command),
         )
-        self.logger.info("已退出采集搜索结果数据模式")
+        self.logger.info("Exited search result collection mode")
 
     @staticmethod
     def generate_model(
@@ -1926,7 +1926,7 @@ class TikTok:
             ):
                 self.logger.warning(model)
                 continue
-            self.logger.info(f"搜索参数: {model.model_dump()}", False)
+            self.logger.info(f"Search params: {model.model_dump()}", False)
             if isinstance(
                 r := await self.deal_search_data(
                     model,

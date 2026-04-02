@@ -139,14 +139,14 @@ class TikTokDownloader:
         **kwargs,
     ):
         self.console.warning(
-            "该功能正在重构，未来开发完成重新开放！",
+            "This feature is being refactored and will be available in a future release!",
         )
 
     async def server(self):
         try:
             self.console.print(
                 _(
-                    "访问 http://127.0.0.1:5555/docs 或者 http://127.0.0.1:5555/redoc 可以查阅 API 模式说明文档！"
+                    "Visit http://127.0.0.1:5555/docs or http://127.0.0.1:5555/redoc to view API documentation!"
                 ),
                 highlight=True,
             )
@@ -197,7 +197,7 @@ class TikTokDownloader:
     async def __init_language(self):
         languages = (
             (
-                "简体中文",
+                "Simplified Chinese",
                 "zh_CN",
             ),
             (
@@ -206,7 +206,7 @@ class TikTokDownloader:
             ),
         )
         language = choose(
-            "请选择语言(Please Select Language)",
+            "Please Select Language",
             [i[0] for i in languages],
             self.console,
         )
@@ -272,7 +272,7 @@ class TikTokDownloader:
         self,
         mode=None,
     ):
-        """选择功能模式"""
+        """Select function mode"""
         while self.running:
             self.__update_menu()
             if not mode:
@@ -289,7 +289,7 @@ class TikTokDownloader:
             mode = None
 
     async def complete(self):
-        """终端交互模式"""
+        """Terminal interactive mode"""
         example = TikTok(
             self.parameter,
             self.database,
@@ -337,7 +337,7 @@ class TikTokDownloader:
         )
         if self.console.input(
             _(
-                "复制 Cookie 内容至剪贴板后，按回车键确认继续；若输入任意内容并按回车，则取消操作："
+                "Copy Cookie to clipboard, press Enter to continue; or type anything and press Enter to cancel:"
             )
         ):
             return
@@ -379,9 +379,9 @@ class TikTokDownloader:
                 _("作品下载记录功能已禁用！"),
             )
             return
-        await self.recorder.delete_ids(self.console.input("请输入需要删除的作品 ID："))
+        await self.recorder.delete_ids(self.console.input("Enter the post ID to delete:"))
         self.console.info(
-            "删除作品下载记录成功！",
+            "Download record deleted successfully!",
         )
 
     async def check_settings(self, restart=True):

@@ -15,33 +15,33 @@ class Extractor:
 
     account_link = compile(
         r"\S*?https://www\.douyin\.com/user/([A-Za-z0-9_-]+)(?:\S*?\bmodal_id=(\d{19}))?"
-    )  # 账号主页链接
+    )  # account homepage link
     account_share = compile(
-        r"\S*?https://www\.iesdouyin\.com/share/user/(\S*?)\?\S*?"  # 账号主页分享链接
+        r"\S*?https://www\.iesdouyin\.com/share/user/(\S*?)\?\S*?"  # account homepage share link
     )
 
-    detail_id = compile(r"\b(\d{19})\b")  # 作品 ID
+    detail_id = compile(r"\b(\d{19})\b")  # post ID
     detail_link = compile(
         r"\S*?https://www\.douyin\.com/(?:video|note|slides)/([0-9]{19})\S*?"
-    )  # 作品链接
+    )  # post link
     detail_share = compile(
         r"\S*?https://www\.iesdouyin\.com/share/(?:video|note|slides)/([0-9]{19})/\S*?"
-    )  # 作品分享链接
+    )  # post share link
     detail_search = compile(
         r"\S*?https://www\.douyin\.com/search/\S+?modal_id=(\d{19})\S*?"
-    )  # 搜索作品链接
+    )  # search post link
     detail_discover = compile(
         r"\S*?https://www\.douyin\.com/discover\S*?modal_id=(\d{19})\S*?"
-    )  # 首页作品链接
+    )  # homepage post link
 
     mix_link = compile(
         r"\S*?https://www\.douyin\.com/collection/(\d{19})\S*?"
-    )  # 合集链接
+    )  # mix link
     mix_share = compile(
         r"\S*?https://www\.iesdouyin\.com/share/mix/detail/(\d{19})/\S*?"
-    )  # 合集分享链接
+    )  # mix share link
 
-    live_link = compile(r"\S*?https://live\.douyin\.com/([0-9]+)\S*?")  # 直播链接
+    live_link = compile(r"\S*?https://live\.douyin\.com/([0-9]+)\S*?")  # live link
     live_link_self = compile(r"\S*?https://www\.douyin\.com/follow\?webRid=(\d+)\S*?")
     live_link_share = compile(
         r"\S*?https://webcast\.amemv\.com/douyin/webcast/reflow/\S+"
@@ -172,13 +172,13 @@ class ExtractorTikTok(Extractor):
 
     detail_link = compile(
         r"\S*?https://www\.tiktok\.com/@[^\s/]+/(?!playlist|collection)(?:(?:video|photo)/(\d{19}))?\S*?"
-    )  # 作品链接
+    )  # post link
 
     mix_link = compile(
         r"\S*?https://www\.tiktok\.com/@\S+/(?:playlist|collection)/(.+?)-(\d{19})\S*?"
-    )  # 合集链接
+    )  # mix link
 
-    live_link = compile(r"\S*?https://www\.tiktok\.com/@[^\s/]+/live\S*?")  # 直播链接
+    live_link = compile(r"\S*?https://www\.tiktok\.com/@[^\s/]+/live\S*?")  # live link
 
     def __init__(self, params: "Parameter"):
         super().__init__(

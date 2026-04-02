@@ -32,7 +32,7 @@ _SETTINGS_PATH = PROJECT_ROOT / "settings.json"
 _ENCODE = "UTF-8-SIG"
 
 _STORAGE_FORMATS = ["", "csv", "xlsx"]
-_LANGUAGES = [("中文 (简体)", "zh_CN"), ("English", "en_US")]
+_LANGUAGES = [("Chinese (Simplified)", "zh_CN"), ("English", "en_US")]
 _BROWSERS = ["chrome", "chromium", "opera", "opera_gx", "brave",
              "edge", "vivaldi", "firefox", "librewolf", "safari"]
 
@@ -400,7 +400,7 @@ class SettingsFrame(ctk.CTkFrame):
         plat_frame.grid(row=r, column=1, padx=Theme.PAD_SM, pady=Theme.PAD_SM, sticky="w")
 
         self._widgets["douyin_platform"] = ctk.CTkSwitch(
-            plat_frame, text="Douyin (抖音)",
+            plat_frame, text="Douyin",
             font=Theme.FONT_BODY, text_color=Theme.TEXT_PRIMARY,
             progress_color=Theme.ACCENT, button_color=Theme.TEXT_SECONDARY,
             button_hover_color=Theme.ACCENT_HOVER,

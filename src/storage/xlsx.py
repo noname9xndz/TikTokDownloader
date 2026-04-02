@@ -14,7 +14,7 @@ __all__ = ["XLSXLogger"]
 
 
 class XLSXLogger(BaseTextLogger):
-    """XLSX 格式保存数据"""
+    """Save data in XLSX format"""
 
     __type = "xlsx"
 
@@ -31,11 +31,11 @@ class XLSXLogger(BaseTextLogger):
     ):
         super().__init__(*args, **kwargs)
         self.console = console
-        self.book = None  # XLSX数据簿
-        self.sheet = None  # XLSX数据表
-        self.name = self._rename(root, self.__type, old, name)  # 文件名称
+        self.book = None  # XLSX workbook
+        self.sheet = None  # XLSX sheet
+        self.name = self._rename(root, self.__type, old, name)  # file name
         self.path = root.joinpath(f"{self.name}.{self.__type}")
-        self.title_line = title_line  # 标题行
+        self.title_line = title_line  # title row
         self.field_keys = field_keys
 
     async def __aenter__(self):

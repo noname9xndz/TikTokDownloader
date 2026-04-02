@@ -88,7 +88,7 @@ class BackendBootstrap:
         self.option = self._format(raw_option)
 
         # 4. Set UI language
-        switch_language(self.option.get("Language", "zh_CN"))
+        switch_language(self.option.get("Language", "en_US"))
 
         # 5. Build recorder + logger selector (mirrors check_config)
         self._build_recorder_and_logger()

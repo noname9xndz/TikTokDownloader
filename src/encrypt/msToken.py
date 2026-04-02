@@ -80,7 +80,7 @@ class MsToken:
     @staticmethod
     def get_fake_ms_token(key="msToken", size=156) -> dict:
         """
-        根据传入长度产生随机字符串
+        Generate a random string of the specified length
         """
         base_str = digits + ascii_uppercase + ascii_lowercase
         length = len(base_str) - 1
@@ -236,9 +236,9 @@ class MsTokenTikTok(MsToken):
 async def test():
     from src.testers import Logger
 
-    print("抖音", await MsToken.get_real_ms_token(Logger(), PARAMS_HEADERS, proxy=None))
+    print("DouYin", await MsToken.get_real_ms_token(Logger(), PARAMS_HEADERS, proxy=None))
     print(
-        "抖音",
+        "DouYin",
         await MsToken.get_long_ms_token(
             Logger(),
             PARAMS_HEADERS,
