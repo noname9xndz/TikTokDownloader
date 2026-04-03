@@ -62,7 +62,7 @@ class YtDlpTikTok:
     ):
         self.parameter = parameter
         self.logger = logger
-        self.root = parameter.root or Path(".")
+        self.root = Path(parameter.root or ".") / (parameter.folder_name or "Download")
         self._python = _get_python()
 
     def _make_cookie_file(self) -> Optional[str]:
