@@ -21,6 +21,7 @@ from ..custom import (
 )
 from ..encrypt import (
     ABogus,
+    DeviceId,
     MsToken,
     MsTokenTikTok,
     TtWid,
@@ -604,6 +605,23 @@ class Parameter:
                 ms_token = await self.__get_token_params_tiktok()
                 tt_wid = await self.__get_tt_wid_params_tiktok()
                 APITikTok.params["msToken"] = ms_token.get(MsTokenTikTok.NAME, "")
+                # Auto-fetch device_id if empty
+                if not APITikTok.params.get("device_id"):
+                    try:
+                        device_id, _cookie = await DeviceId.get_device_id(
+                            self.logger,
+                            self.headers_params_tiktok,
+                            proxy=self.proxy_tiktok,
+                        )
+                        if device_id:
+                            APITikTok.params["device_id"] = device_id
+                            self.logger.info(
+                                f"Auto-fetched TikTok device_id: {device_id}", False
+                            )
+                    except Exception as e:
+                        self.logger.warning(
+                            f"Failed to auto-fetch TikTok device_id: {e}"
+                        )
                 await self.__update_cookie(
                     (
                         ms_token,

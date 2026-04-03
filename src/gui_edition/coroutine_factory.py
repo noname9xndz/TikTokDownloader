@@ -19,6 +19,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Callable, Coroutine, Any, List
 
 from src.application.main_terminal import TikTok
+from src.gui_edition.ytdlp_bridge import YtDlpTikTok
 
 if TYPE_CHECKING:
     from src.config import Parameter
@@ -60,21 +61,30 @@ def make_link_factory(
 ) -> CoroFactory:
     """Factory for batch link/detail downloads.
 
-    The returned coroutine extracts video/image IDs from *urls*, fetches
-    detail data, extracts metadata, and downloads files.
+    For TikTok, uses yt-dlp to bypass WAF/anti-bot protection.
+    For Douyin, uses native API pipeline.
     """
 
     async def _run(urls: List[str]) -> None:
-        t = _new_tiktok(parameter, database)
-        link_obj = t.links_tiktok if tiktok else t.links
-        root, params, logger = t.record.run(parameter)
-        async with logger(root, console=parameter.console, **params) as record:
-            for url in urls:
-                ids = await link_obj.run(url)
-                if not any(ids):
-                    parameter.logger.warning(f"{url} — failed to extract IDs")
-                    continue
-                await t._handle_detail(ids, tiktok, record)
+        if tiktok:
+            # Use yt-dlp for TikTok (native API is blocked by WAF)
+            bridge = YtDlpTikTok(parameter, parameter.logger)
+            downloaded = await bridge.download_urls(urls)
+            if not downloaded:
+                parameter.logger.warning(
+                    "yt-dlp: no files downloaded — check cookies or URL"
+                )
+        else:
+            t = _new_tiktok(parameter, database)
+            link_obj = t.links
+            root, params, logger = t.record.run(parameter)
+            async with logger(root, console=parameter.console, **params) as record:
+                for url in urls:
+                    ids = await link_obj.run(url)
+                    if not any(ids):
+                        parameter.logger.warning(f"{url} — failed to extract IDs")
+                        continue
+                    await t._handle_detail(ids, False, record)
 
     return _run
 
@@ -89,26 +99,35 @@ def make_account_factory(
 ) -> CoroFactory:
     """Factory for account (user profile) downloads.
 
-    Each URL should be an account homepage.  The factory resolves the
-    ``sec_user_id`` and downloads all posts.
+    For TikTok, uses yt-dlp to download the profile page URL directly.
+    For Douyin, uses native API pipeline.
     """
 
     async def _run(urls: List[str]) -> None:
-        t = _new_tiktok(parameter, database)
-        link_obj = t.links_tiktok if tiktok else t.links
-        for index, url in enumerate(urls, start=1):
-            sec_user_id = await link_obj.run(url, "user")
-            if not sec_user_id:
-                parameter.logger.warning(f"{url} — failed to resolve sec_user_id")
-                continue
-            sec_id = sec_user_id[0] if len(sec_user_id) > 0 else ""
-            if not sec_id:
-                continue
-            await t.deal_account_detail(
-                index,
-                sec_user_id=sec_id,
-                tiktok=tiktok,
-            )
+        if tiktok:
+            # Use yt-dlp for TikTok (native API is blocked by WAF)
+            bridge = YtDlpTikTok(parameter, parameter.logger)
+            downloaded = await bridge.download_urls(urls)
+            if not downloaded:
+                parameter.logger.warning(
+                    "yt-dlp: no files downloaded — check cookies or URL"
+                )
+        else:
+            t = _new_tiktok(parameter, database)
+            link_obj = t.links
+            for index, url in enumerate(urls, start=1):
+                sec_user_id = await link_obj.run(url, "user")
+                if not sec_user_id:
+                    parameter.logger.warning(f"{url} — failed to resolve sec_user_id")
+                    continue
+                sec_id = sec_user_id[0] if len(sec_user_id) > 0 else ""
+                if not sec_id:
+                    continue
+                await t.deal_account_detail(
+                    index,
+                    sec_user_id=sec_id,
+                    tiktok=False,
+                )
 
     return _run
 
@@ -124,19 +143,23 @@ def make_mix_factory(
     """Factory for mix (collection) downloads."""
 
     async def _run(urls: List[str]) -> None:
-        t = _new_tiktok(parameter, database)
-        link_obj = t.links_tiktok if tiktok else t.links
-        for url in urls:
-            ids = await link_obj.run(url, "mix")
-            if not ids:
-                parameter.logger.warning(f"{url} — failed to extract mix ID")
-                continue
-            mix_id = ids[0] if len(ids) > 0 else ""
-            if mix_id:
-                await t.deal_mix_detail(
-                    mix_id,
-                    tiktok=tiktok,
-                )
+        if tiktok:
+            bridge = YtDlpTikTok(parameter, parameter.logger)
+            await bridge.download_urls(urls)
+        else:
+            t = _new_tiktok(parameter, database)
+            link_obj = t.links
+            for url in urls:
+                ids = await link_obj.run(url, "mix")
+                if not ids:
+                    parameter.logger.warning(f"{url} — failed to extract mix ID")
+                    continue
+                mix_id = ids[0] if len(ids) > 0 else ""
+                if mix_id:
+                    await t.deal_mix_detail(
+                        mix_id,
+                        tiktok=False,
+                    )
 
     return _run
 
